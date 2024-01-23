@@ -99,15 +99,15 @@ const Sell = () => {
         formData.append('bathrooms', bathroom);
         formData.append('balcony', balcony);
         images.forEach((image, index) => {
-            formData.append(`images[${index}]`, image)
+            formData.append('images', image, `images[${index}]`);
         });
+        console.log(formData)
         try {
             const response = await axios.post('/add/', formData
             , {
                 headers: { 'X-CSRFToken': csrftoken }
             }
             );
-            console.log(response.data);
             setSuccessMessage(response.data.message);
             setErrorMessage(null);
             clearFields();

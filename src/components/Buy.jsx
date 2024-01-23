@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropertyCard from './PropertyCard';
+// import fetchProperties from './FetchProperties';
 import axios from 'axios';
 import {Box} from '@mui/material';
 import {Slider} from '@mui/material';
@@ -42,14 +43,8 @@ const Buy = () => {
     fetchProperties();
   }, [currentPage, searchQuery, sortBy, minPriceFilter, maxPriceFilter]);
 
-  // const api = axios.create({
-  //   baseURL : 'http://127.0.0.1:8000/',
-  // });
-  // const propertiesListEndpoint = 'properties_list/';
-
   const fetchProperties = async () => {
     try {
-      // const response = await api.get(propertiesListEndpoint, {
         const response = await axios.get('/properties_list/', {
         params: {
           page: currentPage,
@@ -131,71 +126,104 @@ const Buy = () => {
   //   const newPage = (data.selected*propertyPerPage) % properties.length;
   //   setCurrentPage(data.selected + 1);
   // };
+  const SearchBox = () => {
+    return (
+      <div className='input-group mb-3'>
+        <input type='text' ref={searchInputRef} className='form-control' placeholder='Search by location, society, etc.' aria-label='Search' aria-describedby='search-addon'/>
+        <button onClick={handleSearchChange} className='btn btn-outline-secondary' type='button' id='search-addon'>
+          <i className='fas fa-search'></i>
+        </button>
+      </div>
+    )
+  }
 
-  return (
-    <div>
-      <div className="container">
-        <div className="row">
-          <div className='col-md-4'>
-            <div className='input-group mb-3'>
-              <input type='text' ref={searchInputRef} className='form-control' placeholder='Search by location, society, etc.' aria-label='Search' aria-describedby='search-addon'/>
-              <button onClick={handleSearchChange} className='btn btn-outline-secondary' type='button' id='search-addon'>
-                <i className='fas fa-search'></i>
-              </button>
-            </div>
-          </div>
-          <div className='col-md-4'>
-            <div className='dropdown'>
-              <button className='btn btn-secondary dropdown-toggle' type='button' id='sortDropdown' data-bs-toggle='dropdown' aria-expanded='false'>
-                Sort By
-              </button>
-              <ul className='dropdown-menu' aria-labelledby='sortDropdown'>
-                <li><button className='dropdown-item' onClick={() => setSortBy('')}>None</button></li>
-                <li><button className='dropdown-item' onClick={() => setSortBy('price')}>Price (low to High)</button></li>
-                <li><button className='dropdown-item' onClick={() => setSortBy('-price')}>Price (High to Low)</button></li>                </ul>
-            </div>
-          </div>
-          <div className='col-md-5'>
-            <div className='card filter-card'>
-              <div className='card-header'>
-                <h5>Filter Properties</h5>
-                <div className='card-body'>
-                  <div className='filter-group'>
-                    <h6>Price Range (in Lacks) :</h6>
-                    <Box sx={{ width: 300}}>
-                    <Slider
-                    value={[minPriceFilter, maxPriceFilter]}
-                    min={0}
-                    max={1000}
-                    onChange={handlePriceFilterChange}
-                    valueLabelDisplay='auto'
-                    />
-                    </Box>
-                    {/* <span className='range-labels'>
-                      <span>{minPriceFilter}</span> - <span>{maxPriceFilter} Lacks</span>
-                    </span> */}
-                  </div>
-                  {/* <div className='filter-group'></div> */}
-                </div>
-              </div>
-            </div>
+  const SortButton = () => {
+    return (
+      <div className='dropdown'>
+        <button className='btn btn-secondary dropdown-toggle' type='button' id='sortDropdown' data-bs-toggle='dropdown' aria-expanded='false'>
+          Sort By
+        </button>
+        <ul className='dropdown-menu' aria-labelledby='sortDropdown'>
+          <li><button className='dropdown-item' onClick={() => setSortBy('')}>None</button></li>
+          <li><button className='dropdown-item' onClick={() => setSortBy('price')}>Price (low to High)</button></li>
+          <li><button className='dropdown-item' onClick={() => setSortBy('-price')}>Price (High to Low)</button></li>
+        </ul>
+      </div>
+    )
+  }
+
+  const FilterBox = () => {
+    return (
+      <div className='card filter-card'>
+        <div className='card-header'>
+          <h5>Filter Properties</h5>
+        </div>
+        <div className='card-body'>
+          <div className='filter-group'>
+            <h6>Price Range (in Lakhs) :</h6>
+            <Box sx={{ width: 300}}>
+              <Slider
+                value={[minPriceFilter, maxPriceFilter]}
+                min={0}
+                max={1000}
+                onChange={handlePriceFilterChange}
+                valueLabelDisplay='auto'
+              />
+            </Box>
+            <span className='range-labels'>
+              <span>Properties in {minPriceFilter}</span> - <span>{maxPriceFilter} Lakhs</span>
+            </span>
+            {/* <div className='filter-group'></div> */}
           </div>
         </div>
-        
-        {/* <div className='row'>
-          <div className='col-md-12'>
-            <div className='filter-group'>
-              <label htmlFor='feature1'>Feature 1:</label>
-              <input
-                type='checkbox'
-                id='feature1'
-                value='feature1'
-                checked={hasFeature1}
-                onChange={handlecheckboxchnge}
-              />
-            </div>
+      </div>
+    )
+  }
+  
+  return (
+    <div className='container'>
+
+      <div className='row text-center'>
+        <h1>humm</h1>
+      </div>
+
+      <div className="row">
+
+        <div className="col-md-4">
+          <div className='row'>
+            <SearchBox/>
           </div>
-        </div> */}
+          <div className='row'>
+            <FilterBox/>
+          </div>
+          
+        </div>
+
+        <div className='col-md-8' style={{height:'100vh', overflowY:'scroll'}}>
+          <div>
+            <SortButton />
+          </div>
+
+          <div>
+            <span>Page {currentPage} of {pageCount} </span>
+            <button onClick={handlePreviousPage}>Previous</button>
+            <button onClick={handleNextpage}>Next</button>
+          </div>
+
+          <div>
+            {isLoading && <p>Loading properties...</p>}
+            {error && <p>Error: {error.message}</p>}
+            {!isLoading && properties.length > 0 && (
+              <div className="container">
+                {properties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+            )}
+            {!isLoading && properties.length === 0 && <p>No properties found.</p>}
+          </div>
+        
+        </div>
         
       </div>
       
@@ -210,49 +238,7 @@ const Buy = () => {
         containerClassname={'pagination'}
         activeClassName={'active'}
       /> */}
-
-      {/* <input type='text' ref={minPriceFilterInputRef}/>
-      <button onClick={handleMinPriceFilterChange}>Min price</button>
-
-      <input type='text' ref={maxPriceFilterInputRef}/>
-      <button onClick={handleMaxPriceFilterChange}>Max price</button> */}
-
-      {/* <input type='range' ref={maxPriceFilterInputRef}/>
-      <button onClick={handleMaxPriceFilterChange}>Price</button> */}
-
-      {/* <input type='text' ref={minPriceFilterInputRef}></input> */}
-      {/* <button onClick={handlePriceFilterChange}>Filter</button> */}
-      {/* <select ref={sortInputRef}>
-        <option value=''>None</option>
-        <option>Price Ascending</option>
-        <option value='-price'>Price Descending</option>
-        <option value='size'>Size Ascending</option>
-        <option value='-size'>Size Descending</option>
-      </select> */}
-      {/* <CheckboxGroup onChange={handleBedroomsFilterChange}>
-        {2}
-      </CheckboxGroup> */}
-
-      <br></br><br></br>
-      <span>Page {currentPage} of {pageCount} </span>
-      <button onClick={handlePreviousPage}>Previous</button>
-      <button onClick={handleNextpage}>Next</button>
-      <br></br>
-
-      {isLoading && <p>Loading properties...</p>}
-      {error && <p>Error: {error.message}</p>}
-      {!isLoading && properties.length > 0 && (
-        <div className="properties-list">
-          {properties
-          //   .filter((property) =>
-          //   property.location.toLowerCase().includes(searchQuery.toLowerCase())
-          // )
-          .map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-        </div>
-      )}
-      {!isLoading && properties.length === 0 && <p>No properties found.</p>}
+      
     </div>
   );
 };
