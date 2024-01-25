@@ -210,11 +210,11 @@ const Buy = () => {
             <button onClick={handleNextpage}>Next</button>
           </div>
 
-          <div>
+          <div className='row'>
             {isLoading && <p>Loading properties...</p>}
             {error && <p>Error: {error.message}</p>}
             {!isLoading && properties.length > 0 && (
-              <div className="container">
+              <div className="col-md-6">
                 {properties.map((property) => (
                   <PropertyCard key={property.id} property={property} />
                 ))}
