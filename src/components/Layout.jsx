@@ -6,9 +6,10 @@ import HomePage from './HomePage';
 import Buy from './Buy';
 import Contact from './Contact';
 import Sell from './Sell';
-import Signin from './Signin';
+// import SigninPage from './SigninPage';
 import PriceEstimator from './PriceEstimator';
 import LocationRecommendation from './LocationRecommendation';
+// import Signup from './Signin'
 
 const Layout = () => {
   return (
@@ -21,9 +22,10 @@ const Layout = () => {
             <Route path="/buy" element={<Buy />} />
             <Route path="/sell" element={<Sell />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/signin" element={<Signin />} />
             <Route path="/price_estimator" element={<PriceEstimator />} />
             <Route path="/recommend_location" element={<LocationRecommendation />} />
+            {/* <Route path="/signinpage" element={<SigninPage/>} />
+            <Route path="/signuppage" element={<Signup/>} /> */}
           </Routes>
         </main>
         <Footer />

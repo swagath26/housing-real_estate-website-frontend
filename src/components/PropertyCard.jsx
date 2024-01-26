@@ -24,26 +24,26 @@ const PropertyCard = ({ property }) => {
   };
 
   return (
-    <div className='card'>
-      
+    <div className='col-6'>
+      <div className='card'>
         <Slider {...settings} className='card-img-top'>
           {property.image_files.map((image, index) => (
             <div key={index}>
-              <img src={image.image} alt={`Property Image ${index+1}`} />
+              <img className='img-fluid' src={image.image} alt={`Property Image ${index+1}`} />
             </div>
           ))}
         </Slider>
       
-      <div className="card-body">
-        <h4 className='card-title'>INR {property.price} lakhs</h4>
-        <p className='card-text'>
-          {property.size} | {property.bathrooms} ba | {property.balcony && 'Balcony'} | {property.area} sqft | {property.area_type}
-          <br />
-          {property.society}, {property.location}, Bengaluru
-          <p>Listing by: Anonymous | {property.availability}</p>
-        </p>
+        <div className="card-body">
+          <h4 className='card-title'>INR {property.price} lakhs</h4>
+          <p className='card-text'>
+            {property.size} | {property.bathrooms} ba | {property.balcony && 'Balcony'} | {property.area} sqft | {property.area_type}
+            <br />
+            {property.society}, {property.location}, Bengaluru
+            <p>Listing by: Anonymous | {property.availability}</p>
+          </p>
+        </div>
       </div>
-
     </div>
   );
 };

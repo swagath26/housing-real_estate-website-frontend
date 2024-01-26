@@ -214,9 +214,9 @@ const Buy = () => {
             {isLoading && <p>Loading properties...</p>}
             {error && <p>Error: {error.message}</p>}
             {!isLoading && properties.length > 0 && (
-              <div className="col-md-6">
+              <div className='row'>
                 {properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
+                    <PropertyCard key={property.id} property={property} />
                 ))}
               </div>
             )}
