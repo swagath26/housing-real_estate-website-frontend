@@ -29,7 +29,7 @@ const Header = () => {
               <Link to="/sell" className="nav-link">Sell</Link>
             </li>
             <li className="nav-item">
-              <Link to="/contact" className="nav-link">Contact</Link>
+              <Link to="/about" className="nav-link">About</Link>
             </li>
             <li className='nav-item'>
               <SigninButton />

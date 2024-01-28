@@ -6,31 +6,31 @@ import HomePage from './HomePage';
 import Buy from './Buy';
 import Contact from './Contact';
 import Sell from './Sell';
-// import SigninPage from './SigninPage';
 import PriceEstimator from './PriceEstimator';
 import LocationRecommendation from './LocationRecommendation';
-// import Signup from './Signin'
+import SellHome from './SellHome';
+import About from './About';
 
 const Layout = () => {
   return (
-    <Router>
-      <div>
+    <div>
+      <Router>
         <Header />
         <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/buy" element={<Buy />} />
             <Route path="/sell" element={<Sell />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/sell_home" element={<SellHome/>}/>
+            <Route path="/about" element={<About />} />
             <Route path="/price_estimator" element={<PriceEstimator />} />
             <Route path="/recommend_location" element={<LocationRecommendation />} />
-            {/* <Route path="/signinpage" element={<SigninPage/>} />
-            <Route path="/signuppage" element={<Signup/>} /> */}
+            <Route path='/contact' element={<Contact />} />
           </Routes>
         </main>
         <Footer />
-      </div>
-    </Router>
+      </Router>
+    </div>
   );
 };
 

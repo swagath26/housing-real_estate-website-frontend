@@ -1,40 +1,43 @@
-import { Link } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Link} from "react-router-dom";
+import { Routes, Route } from 'react-router-dom';
 import SigninPage from "./SigninPage";
 import RegisterPage from "./RegisterPage";
 import ForgotPasswordPage from "./ForgotPasswordPage";
+import { useState } from "react";
 
 const SigninButton = () => {
+
+    const [navigate, setNavigate] = useState('signinpage');
+
     return (
         <div>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signin">
+            <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signin">
                 Signin
             </button>
-            <div class="modal fade" id="signin" aria-labelledby="signinLabel">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="signinLabel">Welcome to Housing</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div className="modal fade" id="signin" aria-labelledby="signinLabel">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1 className="modal-title fs-5" id="signinLabel">Welcome to Housing</h1>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
+                        <div className="modal-body">
                             <nav className="nav">
                                 <ul className="nav nav-underline">
-                                <li className="nav-item">
-                                <Link to="/signinpage" className="nav-link">Signin</Link>
-                                </li>
-                                <li className="nav-item">
-                                <Link to="/registerpage" className="nav-link">New Account</Link>
-                                </li>
+                                    <li className="nav-item">
+                                        <button onClick={() => {setNavigate('signinpage')}} className="nav-link">Signin</button>
+                                    </li>
+                                    <li className="nav-item">
+                                        <button onClick={() => {setNavigate('registerpage')}} className="nav-link">New Account</button>
+                                    </li>
                                 </ul>
                             </nav>
                             <div className="container">
-                                <Routes>
-                                    <Route index element={<SigninPage/>}></Route>
-                                    <Route path="/forgotpasswordpage" element={<ForgotPasswordPage />}></Route>
-                                    <Route path="/signinpage" element={<SigninPage/>}></Route>
-                                    <Route path="/registerpage" element={<RegisterPage/>}></Route>
-                                </Routes>
+                                
+                                {navigate=="forgotpasswordpage" && <ForgotPasswordPage />}
+                                {navigate=="signinpage" && <SigninPage/>}
+                                {navigate=="registerpage" && <RegisterPage/>}
+                                
                             </div>
                         </div>
                     </div>

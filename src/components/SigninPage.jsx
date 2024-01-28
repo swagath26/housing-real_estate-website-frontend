@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const SigninPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    
+
     const handleLogin = () => {
 
     }
@@ -17,9 +17,6 @@ const SigninPage = () => {
     const handleForgotPassword = () => {
 
     }
-
-    // const { isOpen, setIsOpen } = useContext(MyContext);
-    // const handleClick = () => setIsOpen(!isOpen);
 
     return (
         
@@ -65,12 +62,12 @@ const SigninPage = () => {
 
                 <div className="row p-2 g-5">
                 <div className="col-auto">
-                <Link to="/forgotpasswordpage">Forgot Password?</Link>
+                <a href="#" className="link">Forgot Password?</a>
                 </div>
                 </div>
 
                 <div className="register-link">
-                    <p>Don't have an account? <Link to="/registerpage">Register</Link></p>
+                    <p>Don't have an account? <a href="#" className="link">Register</a></p>
                 </div>
                 </form>
             </div>

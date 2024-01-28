@@ -40,26 +40,26 @@ const RegisterPage = () => {
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="password" className="col-form-label">Set Password</label>
+                    <label htmlFor="password1" className="col-form-label">Set Password</label>
                     </div>
                     <div className="col-auto g-1">
                     <FaLock className="icon" />
                     </div>
                     <div className="col-auto">
-                    <input type="password" className="form-control" placeholder="Enter new password" id="password" value={password} onChange={(event) => setPassword(event.target.value)} aria-describedby="passwordHelp"/>
+                    <input type="password" className="form-control" placeholder="Enter new password" id="password1" value={password} onChange={(event) => setPassword(event.target.value)} aria-describedby="passwordHelp"/>
                     </div>
                     <div id="passwordHelp" className="form-text">Password must be 8-20 characters long</div>
                 </div>
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="password" className="col-form-label">Confirm Password</label>
+                    <label htmlFor="password2" className="col-form-label">Confirm Password</label>
                     </div>
                     <div className="col-auto g-1">
                     <FaLock className="icon" />
                     </div>
                     <div className="col-auto">
-                    <input type="password" className="form-control" placeholder="Enter password" id="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+                    <input type="password" className="form-control" placeholder="Enter password" id="password2" value={password} onChange={(event) => setPassword(event.target.value)} />
                     </div>
                 </div>
 
@@ -76,7 +76,7 @@ const RegisterPage = () => {
                 </div>
 
                 <div className="register-link">
-                    <p>Already have an account? <Link to="/signinpage">Signin</Link></p>
+                    <p>Already have an account? <a href="#" className="link">Signin</a></p>
                 </div>
                 </form>
             </div>

@@ -1,162 +1,74 @@
-import { useState } from "react";
-import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Sell = () => {
-    const [location, setLocation] = useState('');
-    const handleLocationValue = (event) => {
-        setLocation(event.target.value);
-    }
-
-    const [society, setSociety] = useState('');
-    const handleSocietyValue = (event) => {
-        setSociety(event.target.value);
-    }
-
-    const [areaType, setAreaType] = useState('');
-    const handleAreaTypeValue = (event) => {
-        setAreaType(event.target.value);
-    }
-
-    const [availability, setAvailability] = useState('');
-    const handleAvailabilityValue = (event) => {
-        setAvailability(event.target.value);
-    }
-
-    const [balcony, setBalcony] = useState(0);
-    const handleBalconyValue = (event) => {
-        setBalcony(event.target.value);
-    }
-
-    const [area, setArea] = useState(0);
-    const handleAreaValue = (event) => {
-        setArea(event.target.value);
-    }
-
-    const [price, setPrice] = useState(0);
-    const handlePriceValue = (event) => {
-        setPrice(event.target.value);
-    }
-
-    const [bathroom, setBathroom] = useState(0);
-    const handleBathroomValue = (event) => {
-        setBathroom(event.target.value);
-    }
-
-    const [size, setSize] = useState(0);
-    const handleSizeValue = (event) => {
-        setSize(event.target.value);
-    }
-
-    const [images, setImages] = useState([]);
-    const handleImageUpload = (event) => {
-        const newImages = [...images, ...event.target.files]
-        setImages(newImages);
-    }
-
-    const [successMessage, setSuccessMessage] = useState(null);
-    const [errorMessage, setErrorMessage] = useState(null);
-
-    function clearFields() {
-        setLocation('');
-        setSociety('');
-        setAreaType('');
-        setAvailability('');
-        setBalcony(0);
-        setBathroom(0);
-        setSize(0);
-        setSize(0);
-        setArea(0);
-        setImages([]);
-    }
-
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    // Does this cookie string begin with the name we want?
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        const csrftoken = getCookie('csrftoken');
-
-    const handleSubmitForm = async (event) => {
-        event.preventDefault();
-        const formData = new FormData();
-        formData.append('location', location);
-        formData.append('society', society);
-        formData.append('area', area);
-        formData.append('area_type', areaType);
-        formData.append('availability', availability);
-        formData.append('size', size);
-        formData.append('price', price);
-        formData.append('bathrooms', bathroom);
-        formData.append('balcony', balcony);
-        images.forEach((image, index) => {
-            formData.append('images', image, `images[${index}]`);
-        });
-        console.log(formData)
-        try {
-            const response = await axios.post('/add/', formData
-            , {
-                headers: { 'X-CSRFToken': csrftoken }
-            }
-            );
-            setSuccessMessage(response.data.message);
-            setErrorMessage(null);
-            clearFields();
-        }
-        catch (error) {
-            setErrorMessage(error.response.data.errors || 'Something went wrong!')
-        }
-    }
 
     return (
         <div>
-            <h1>Add your property</h1><br/>
+            <div className="container p-5">
+                <div className="row">
+                    <div className="col-8">
+                            <h1>Sell with a partner agent</h1>
+                            <p>Zillow helps you sell your home, your way. Easily explore your selling options 
+                                below and get personalized market value estimates — we can even help you choose 
+                                the best option when youre ready.
+                                This experience is currently available in 45 markets across Arizona, Colorado, 
+                                Florida, Georgia, Indiana, Kansas, Massachusetts, Michigan, Minnesota, Missouri, 
+                                Nevada, New Jersey, New Mexico, New York, North Carolina, Ohio, Oklahoma, Oregon, 
+                                South Carolina, Tennessee, Texas, Utah, and Washington DC. Click here to see if 
+                                it's available in your city.</p>
+                    </div>
+                </div>
+            </div>
+            <div className="container p-5">
+                <div className="row">
+                    <div className="col-8">
+                            <h1>Sell your home yourself</h1>
+                            <p> Deciding to sell your home yourself is referred to as for-sale-by-owner (FSBO). 
+                                The FSBO process is similar to traditional selling, but without the help of a 
+                                real estate agent. In this case, you’re responsible for the home prep, marketing, 
+                                showings, and negotiations.</p>
+                    </div>
 
-            <form >
-                <label htmlFor="location">Location</label>
-                <input type="text" id="location" value={location} onChange={handleLocationValue} /><br/>
-
-                <label htmlFor="society">Society</label>
-                <input type="text" id="society" value={society} onChange={handleSocietyValue}></input><br/>
-
-                <label htmlFor="area_type">Area_type</label>
-                <input type="text" id="area_type" value={areaType} onChange={handleAreaTypeValue}></input><br/>
-
-                <label htmlFor="availability">Availability</label>
-                <input type="text" id="availability" value={availability} onChange={handleAvailabilityValue}></input><br/>
-
-                <label htmlFor="balcony">Balcony</label>
-                <input type="number" id="balcony" value={balcony} onChange={handleBalconyValue}></input><br/>
-
-                <label htmlFor="area">Area</label>
-                <input type="number" id="area" value={area} onChange={handleAreaValue}></input><br/>
-
-                <label htmlFor="price">Price</label>
-                <input type="number" id="price" value={price} onChange={handlePriceValue}></input><br/>
-
-                <label htmlFor="bathroom">Bathrooms</label>
-                <input type="number" id="bathroom" value={bathroom} onChange={handleBathroomValue}></input><br/>
-
-                <label htmlFor="size">Bedrooms</label>
-                <input type="number" id="size" value={size} onChange={handleSizeValue}></input><br/>
-
-                <label htmlFor="image">Upload Image</label>
-                <input type="file" id="images" multiple onChange={handleImageUpload}></input><br/><br/>
-    
-                {errorMessage && <div>{errorMessage}</div>}
-                {successMessage && <div>{successMessage}Uploaded</div>}
-
-                <button type="submit" onClick={handleSubmitForm}>Add</button><br/>
-            </form>
+                </div>
+                <div className="row">
+                    <div className="col-4">
+                        <Link to="/sell_home" className="btn btn-primary">
+                            Post your home for sale
+                        </Link>
+                    </div>
+                </div>
+                <br />
+                <div className="row">
+                    <a href="#" className="link">Learn more about FSBO</a>
+                </div>
+                <br />
+                <div className="row">
+                    <div className="col-4">
+                        <h3>Why Sell</h3>
+                        <ul>
+                            <li>
+                                <p>Avoid paying a listing agent commission</p>
+                            </li>
+                            <li>
+                                <p>Advertise your listing for free on Zillow</p>
+                            </li>
+                            <li>
+                                <p>Flexibility and control from start to finish</p>
+                            </li>
+                        </ul>
+                    </div>
+                    <div className="col-4">
+                        <h3>How to Sell</h3>
+                        <p>When selling yourself, start with home prep, staging, and hiring a professional 
+                            photographer. Once your marketing materials are ready, research comparable homes 
+                            to help price your home. Then, list on Zillow. You’ll likely host home showings 
+                            or open houses. Then select an offer, negotiate, accept and close.</p>
+                    </div>
+                </div>
+            </div>
+            <div className="container text-center p-5">
+                <h1>Go to resources for a succesful sale</h1>
+            </div>
         </div>
     )
 }
