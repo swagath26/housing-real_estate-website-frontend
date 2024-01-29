@@ -77,7 +77,7 @@ const ForgotPasswordPage = () => {
 
                 <div className="row p-2 g-5">
                 <div className="col-auto">
-                    <p>Know your Password? <Link to="/signin">Sign in</Link></p>
+                    <p>Know your Password? <Link to="/accounts">Sign in</Link></p>
                 </div>
                 </div>
 

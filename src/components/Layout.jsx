@@ -10,9 +10,9 @@ import PriceEstimator from './PriceEstimator';
 import LocationRecommendation from './LocationRecommendation';
 import SellHome from './SellHome';
 import About from './About';
-import Signin from './Signin'
-import ForgotPassword from './ForgotPassword'
-import AuthContext from './AuthContext';
+import ForgotPasswordPage from './ForgotPasswordPage';
+import Accounts from './Accounts';
+import SignoutPage from './SignoutPage';
 
 const Layout = () => {
 
@@ -34,8 +34,9 @@ const Layout = () => {
             <Route path="/price_estimator" element={<PriceEstimator />} />
             <Route path="/recommend_location" element={<LocationRecommendation />} />
             <Route path='/contact' element={<Contact />} />
-            <Route path='/signin' element={<Signin />} />
-            <Route path='/forgot-password' element={<ForgotPassword />} />
+            <Route path='/accounts' element={<Accounts />} />
+            <Route path='/signout' element={<SignoutPage />} />
+            <Route path='/forgot-password' element={<ForgotPasswordPage />} />
           </Routes>
         </main>
         <Footer />

@@ -1,6 +1,6 @@
 import { useState, useContext } from "react"
 import { FaLock, FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import getCookie from "./csrfToken";
 import AuthContext from "./AuthContext";
@@ -9,6 +9,7 @@ const csrftoken = getCookie('csrftoken');
 
 const SigninForm = () => {
 
+    const navigate = useNavigate();
     const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
 
     const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ const SigninForm = () => {
     const [remember, setRemember] = useState(false);
 
     const [errorMessage, setErrorMessage] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+    // const [successMessage, setSuccessMessage] = useState(null);
 
     const handleSignin = async (event) => {
         event.preventDefault();
@@ -27,31 +28,22 @@ const SigninForm = () => {
         
         const response = await axios.post('/members/signin/', formData, {headers: { 'X-CSRFToken': csrftoken }});
         if (response.data.success) {
-            setSuccessMessage(response.data.messages);
             setIsAuthenticated(true);
+            navigate('/');
         }
         else {
             setErrorMessage(response.data.messages || 'Something went wrong');
-            setIsAuthenticated(false);
-        }
-        console.log(response);
-    }
-
-    const handleSignout = async () => {
-        const response = await axios.get('/members/signout/');
-        console.log(response);
-        if (response.data.success) {
-            setSuccessMessage(response.data.messages);
             setIsAuthenticated(false);
         }
     }
 
     return (
         <div>
-            {(!isAuthenticated) && 
+            {/* {isAuthenticated && navigate('/signout')} */}
+
+            {/* {(!isAuthenticated) &&  */}
             <div className="card mt-4">
                 {errorMessage}
-                {successMessage}
                 <form>
                 <div className="row p-2">
                     <div className="col-auto">
@@ -100,22 +92,7 @@ const SigninForm = () => {
 
                 </form>
             </div>
-            }
-            {isAuthenticated && 
-            <div className="card mt-4">
-                <div className="row p-2">
-                    {successMessage}
-                </div>
-                <div className="row p-2">
-                    <div className="col-auto">
-                        <button className="btn btn-primary" onClick={handleSignout}>Sign Out</button>
-                    </div>
-                </div>
-                <div className="row p-2">
-                    <Link to="/">Go Home</Link>
-                </div>
-            </div>
-            }
+            {/* } */}
         </div> 
     )
 }

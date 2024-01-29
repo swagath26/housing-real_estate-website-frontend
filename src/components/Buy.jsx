@@ -184,7 +184,7 @@ const Buy = () => {
     <div className='container'>
 
       <div className='row text-center'>
-        <h1>humm</h1>
+        {/* <h1>humm</h1> */}
       </div>
 
       <div className="row">
@@ -200,21 +200,35 @@ const Buy = () => {
         </div>
 
         <div className='col-md-8' style={{height:'100vh', overflowY:'scroll'}}>
-          <div>
-            <SortButton />
+          <div className='row g-2 p-2'>
+            <div>
+              <b>Homes for sale</b>
+            </div>
+            <div className='col-md-8'>
+              Search Results
+            </div>
+            <div className='col-md-4 d-flex justify-content-center'>
+              <SortButton />
+            </div>
           </div>
 
-          <div>
-            <span>Page {currentPage} of {pageCount} </span>
-            <button onClick={handlePreviousPage}>Previous</button>
-            <button onClick={handleNextpage}>Next</button>
+          <div className='row g-2 p-1'>
+            <div className='col-5 d-flex justify-content-end'>
+              <button className='btn btn-primary' onClick={handlePreviousPage}>Previous</button>
+            </div>
+            <div className='col-2 d-flex flex-column justify-content-center'>
+              <span>Page {currentPage} of {pageCount} </span>
+            </div>
+            <div className='col-5'>
+              <button className='btn btn-primary' onClick={handleNextpage}>Next</button>
+            </div>
           </div>
 
-          <div className='row'>
+          <div className='row p-1'>
             {isLoading && <p>Loading properties...</p>}
             {error && <p>Error: {error.message}</p>}
             {!isLoading && properties.length > 0 && (
-              <div className='row'>
+              <div className='row g-2'>
                 {properties.map((property) => (
                     <PropertyCard key={property.id} property={property} />
                 ))}

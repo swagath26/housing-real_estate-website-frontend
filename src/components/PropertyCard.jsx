@@ -1,46 +1,42 @@
 import React, { Component, useState } from 'react';
-import Slider from 'react-slick';
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const PropertyCard = ({ property }) => {
-  
-  const settings = {
-    // customPaging: function(i) {
-    //   return (
-    //     <a>
-    //       <img src={property.image_files[i].image}/>
-    //     </a>
-    //   )
-    // },
-    dots: true,
-    centerMode: true,
-    dotsClass: "slick-dots slick-thumb",
-    infinite:true,
-    speed:500,
-    slidesToShow:1,
-    // adaptiveHeight:true,
-    slidesToScroll:1,
-  };
 
   return (
     <div className='col-6'>
       <div className='card'>
-        <Slider {...settings} className='card-img-top'>
-          {property.image_files.map((image, index) => (
-            <div key={index}>
-              <img className='img-fluid' src={image.image} alt={`Property Image ${index+1}`} />
+        <div className='card-img-top d-flex justify-content-center'>
+          <div id={`property_${property.id}`} class="carousel slide">
+            <div class="carousel-inner">
+
+              {property.image_files.map((image, index) => (
+              <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index} style={{height:'250px'}}>
+                <img className='w-100 p-2 h-100 object-fit-contain' src={image.image} alt={`Property Image ${index+1}`} />
+              </div>
+              ))}
+
             </div>
-          ))}
-        </Slider>
+            <button class="carousel-control-prev" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+
+            <button class="carousel-control-next" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+
+          </div>
+        </div>
       
-        <div className="card-body">
-          <h4 className='card-title'>INR {property.price} lakhs</h4>
-          <p className='card-text'>
+        <div className="card-body" style={{height:'200px'}}>
+          <h6 className='card-title'><b>INR {property.price} lakhs</b></h6>
+          <p style={{fontSize:'18px'}} className='card-text'>
             {property.size} | {property.bathrooms} ba | {property.balcony && 'Balcony'} | {property.area} sqft | {property.area_type}
             <br />
             {property.society}, {property.location}, Bengaluru
-            <p>Listing by: Anonymous | {property.availability}</p>
+            <p style={{fontSize:'14px'}}>Listing by: Anonymous | {property.availability}</p>
           </p>
         </div>
       </div>

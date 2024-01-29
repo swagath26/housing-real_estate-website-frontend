@@ -1,10 +1,9 @@
 import { Link} from "react-router-dom";
 import { Routes, Route } from 'react-router-dom';
-import RegisterPage from "./RegisterPage";
-import ForgotPasswordPage from "./ForgotPasswordPage";
 import { useContext, useState } from "react";
-import SigninForm from "./SigninPage";
+import SigninForm from "./SigninForm";
 import AuthContext from "./AuthContext";
+import RegisterForm from "./RegisterForm";
 
 // const SigninButton = () => {
 
@@ -51,11 +50,11 @@ import AuthContext from "./AuthContext";
 
 
 
-const Signin = () => {
+const Accounts = () => {
 
     const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
 
-    const [navigate, setNavigate] = useState('signinpage');
+    const [navigate, setNavigate] = useState('signinform');
 
     return (
         <div>
@@ -70,18 +69,17 @@ const Signin = () => {
                             <nav className="nav">
                                 <ul className="nav nav-underline">
                                     <li className="nav-item">
-                                        <button onClick={() => {setNavigate('signinpage')}} className="nav-link">Signin</button>
+                                        <button onClick={() => {setNavigate('signinform')}} className="nav-link">Signin</button>
                                     </li>
                                     <li className="nav-item">
-                                        <button onClick={() => {setNavigate('registerpage')}} className="nav-link">New Account</button>
+                                        <button onClick={() => {setNavigate('registerform')}} className="nav-link">New Account</button>
                                     </li>
                                 </ul>
                             </nav>
                             <div className="container">
                                 
-                                {navigate=="forgotpasswordpage" && <ForgotPasswordPage />}
-                                {navigate=="signinpage" && <SigninForm/>}
-                                {navigate=="registerpage" && <RegisterPage/>}
+                                {navigate=="signinform" && <SigninForm/>}
+                                {navigate=="registerform" && <RegisterForm/>}
                                 
                             </div>
                         </div>
@@ -92,4 +90,4 @@ const Signin = () => {
     )
 }
 
-export default Signin;
+export default Accounts;
