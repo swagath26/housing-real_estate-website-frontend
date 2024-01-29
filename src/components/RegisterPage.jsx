@@ -2,6 +2,7 @@ import { useState } from "react"
 import { FaLock, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -74,10 +75,7 @@ const RegisterPage = () => {
                     <button type="submit" className="btn btn-primary" onClick={handleRegister}>Signup</button>
                     </div>
                 </div>
-
-                <div className="register-link">
-                    <p>Already have an account? <a href="#" className="link">Signin</a></p>
-                </div>
+                
                 </form>
             </div>
         

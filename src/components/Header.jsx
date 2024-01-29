@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import SigninButton from './Signin';
+import AccountsModal from './Signin';
 
 const Header = () => {
+
   return (
     <header className="header py-3 ">
       <nav className="navbar navbar-expand-md">
@@ -31,8 +33,8 @@ const Header = () => {
             <li className="nav-item">
               <Link to="/about" className="nav-link">About</Link>
             </li>
-            <li className='nav-item'>
-              <SigninButton />
+            <li className="nav-item">
+              <Link to="/signin" className="nav-link">Signin</Link>
             </li>
             <li className="nav-item dropdown">
               <button className='btn btn-secondary dropdown-toggle' type='button' data-bs-toggle='dropdown' aria-expanded='false'>

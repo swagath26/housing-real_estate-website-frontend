@@ -1,8 +1,14 @@
 import { useState } from "react"
 import { FaLock, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import ForgotPasswordPage from "./ForgotPasswordPage";
 
 const SigninPage = () => {
+    return (
+        <SigninForm />
+    )
+}
+const SigninForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -62,13 +68,10 @@ const SigninPage = () => {
 
                 <div className="row p-2 g-5">
                 <div className="col-auto">
-                <a href="#" className="link">Forgot Password?</a>
+                    <Link to="/forgot-password" className="link">Forgot Password?</Link>
                 </div>
                 </div>
 
-                <div className="register-link">
-                    <p>Don't have an account? <a href="#" className="link">Register</a></p>
-                </div>
                 </form>
             </div>
         

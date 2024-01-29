@@ -10,6 +10,8 @@ import PriceEstimator from './PriceEstimator';
 import LocationRecommendation from './LocationRecommendation';
 import SellHome from './SellHome';
 import About from './About';
+import Signin from './Signin'
+import ForgotPassword from './ForgotPassword'
 
 const Layout = () => {
   return (
@@ -26,6 +28,8 @@ const Layout = () => {
             <Route path="/price_estimator" element={<PriceEstimator />} />
             <Route path="/recommend_location" element={<LocationRecommendation />} />
             <Route path='/contact' element={<Contact />} />
+            <Route path='/signin' element={<Signin />} />
+            <Route path='/forgot-password' element={<ForgotPassword />} />
           </Routes>
         </main>
         <Footer />

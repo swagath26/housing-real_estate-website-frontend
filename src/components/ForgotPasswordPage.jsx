@@ -74,6 +74,13 @@ const ForgotPasswordPage = () => {
                     <button type="submit" className="btn btn-primary" onClick={handleRegister}>Reset Password</button>
                     </div>
                 </div>
+
+                <div className="row p-2 g-5">
+                <div className="col-auto">
+                    <p>Know your Password? <Link to="/signin">Sign in</Link></p>
+                </div>
+                </div>
+
                 </form>
             </div>
         
