@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import getCookie from './csrfToken';
 
 const SellHome = () => {
     const [location, setLocation] = useState('');
@@ -69,21 +70,22 @@ const SellHome = () => {
         setImages([]);
     }
 
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        const csrftoken = getCookie('csrftoken');
+        // function getCookie(name) {
+        //     let cookieValue = null;
+        //     if (document.cookie && document.cookie !== '') {
+        //         const cookies = document.cookie.split(';');
+        //         for (let i = 0; i < cookies.length; i++) {
+        //             const cookie = cookies[i].trim();
+        //             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     return cookieValue;
+        // }
+    
+    const csrftoken = getCookie('csrftoken');
 
     const handleSubmitForm = async (event) => {
         event.preventDefault();
@@ -100,19 +102,16 @@ const SellHome = () => {
         images.forEach((image, index) => {
             formData.append('images', image, `images[${index}]`);
         });
-        console.log(formData)
         try {
-            const response = await axios.post('/add/', formData
-            , {
-                headers: { 'X-CSRFToken': csrftoken }
-            }
-            );
+            const response = await axios.post('/add/', formData, {headers: { 'X-CSRFToken': csrftoken }});
+            console.log(response);
             setSuccessMessage(response.data.message);
             setErrorMessage(null);
             clearFields();
         }
         catch (error) {
             setErrorMessage(error.response.data.errors || 'Something went wrong!')
+            console.log(error.response);
         }
     }
 

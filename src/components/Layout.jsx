@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
@@ -12,10 +12,16 @@ import SellHome from './SellHome';
 import About from './About';
 import Signin from './Signin'
 import ForgotPassword from './ForgotPassword'
+import AuthContext from './AuthContext';
 
 const Layout = () => {
+
+  // const AuthContext = createContext();
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
     <div>
+      {/* <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}> */}
       <Router>
         <Header />
         <main>
@@ -34,6 +40,7 @@ const Layout = () => {
         </main>
         <Footer />
       </Router>
+      {/* </AuthContext.Provider> */}
     </div>
   );
 };

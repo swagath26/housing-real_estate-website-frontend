@@ -1,32 +1,57 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { FaLock, FaUser } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import ForgotPasswordPage from "./ForgotPasswordPage";
+import axios from "axios";
+import getCookie from "./csrfToken";
+import AuthContext from "./AuthContext";
 
-const SigninPage = () => {
-    return (
-        <SigninForm />
-    )
-}
+const csrftoken = getCookie('csrftoken');
+
 const SigninForm = () => {
+
+    const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [remember, setRemember] = useState(false);
 
-    const handleLogin = () => {
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [successMessage, setSuccessMessage] = useState(null);
 
+    const handleSignin = async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('remember', remember);
+        
+        const response = await axios.post('/members/signin/', formData, {headers: { 'X-CSRFToken': csrftoken }});
+        if (response.data.success) {
+            setSuccessMessage(response.data.messages);
+            setIsAuthenticated(true);
+        }
+        else {
+            setErrorMessage(response.data.messages || 'Something went wrong');
+            setIsAuthenticated(false);
+        }
+        console.log(response);
     }
 
-    const handleRegister = () => {
-
-    }
-
-    const handleForgotPassword = () => {
-
+    const handleSignout = async () => {
+        const response = await axios.get('/members/signout/');
+        console.log(response);
+        if (response.data.success) {
+            setSuccessMessage(response.data.messages);
+            setIsAuthenticated(false);
+        }
     }
 
     return (
-        
+        <div>
+            {(!isAuthenticated) && 
             <div className="card mt-4">
+                {errorMessage}
+                {successMessage}
                 <form>
                 <div className="row p-2">
                     <div className="col-auto">
@@ -38,7 +63,8 @@ const SigninForm = () => {
                     <div className="col-auto">
                     <input type="email" className="form-control" placeholder="Enter your email" id="email" value={email} onChange={(event) => setEmail(event.target.value)} aria-describedby="emailHelp"/>
                     </div>
-                    <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
+                    <div id="emailHelp" className="form-text">We will never share your email with anyone else.
+                    </div>
                 </div>
 
                 <div className="row p-2">
@@ -56,13 +82,13 @@ const SigninForm = () => {
 
                 <div className="row p-2 g-2">
                     <div className="col-auto">
-                    <input type="checkbox" className="form-check-input" id="rememberme" />
+                    <input type="checkbox" className="form-check-input" id="rememberme" onChange={(event) => {setRemember(event.target.value)}} />
                     </div>
                     <div className="col-auto">
                     <label htmlFor="rememberme" className="form-check-label">Remember me</label>
                     </div>
                     <div className="col-auto">
-                    <button type="submit" className="btn btn-primary" onClick={handleLogin}>Login</button>
+                    <button type="submit" className="btn btn-primary" onClick={handleSignin}>Signin</button>
                     </div>
                 </div>
 
@@ -74,8 +100,24 @@ const SigninForm = () => {
 
                 </form>
             </div>
-        
+            }
+            {isAuthenticated && 
+            <div className="card mt-4">
+                <div className="row p-2">
+                    {successMessage}
+                </div>
+                <div className="row p-2">
+                    <div className="col-auto">
+                        <button className="btn btn-primary" onClick={handleSignout}>Sign Out</button>
+                    </div>
+                </div>
+                <div className="row p-2">
+                    <Link to="/">Go Home</Link>
+                </div>
+            </div>
+            }
+        </div> 
     )
 }
 
-export default SigninPage;
+export default SigninForm;

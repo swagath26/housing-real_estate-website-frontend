@@ -1,10 +1,10 @@
 import { Link} from "react-router-dom";
 import { Routes, Route } from 'react-router-dom';
-import SigninPage from "./SigninPage";
 import RegisterPage from "./RegisterPage";
 import ForgotPasswordPage from "./ForgotPasswordPage";
-import { useState } from "react";
-
+import { useContext, useState } from "react";
+import SigninForm from "./SigninPage";
+import AuthContext from "./AuthContext";
 
 // const SigninButton = () => {
 
@@ -53,6 +53,8 @@ import { useState } from "react";
 
 const Signin = () => {
 
+    const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
+
     const [navigate, setNavigate] = useState('signinpage');
 
     return (
@@ -78,7 +80,7 @@ const Signin = () => {
                             <div className="container">
                                 
                                 {navigate=="forgotpasswordpage" && <ForgotPasswordPage />}
-                                {navigate=="signinpage" && <SigninPage/>}
+                                {navigate=="signinpage" && <SigninForm/>}
                                 {navigate=="registerpage" && <RegisterPage/>}
                                 
                             </div>
