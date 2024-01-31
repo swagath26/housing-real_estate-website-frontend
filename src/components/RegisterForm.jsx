@@ -1,17 +1,18 @@
 import { useState, useContext } from "react"
 import { FaLock, FaUser } from "react-icons/fa";
-import getCookie from "./csrfToken";
+// import getCookie from "./csrfToken";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "./AuthContext";
 
-const csrftoken = getCookie('csrftoken');
+// const csrftoken = getCookie('csrftoken');
 
 const RegisterForm = () => {
 
     const navigate = useNavigate();
 
     const setIsAuthenticated = useContext(AuthContext).setIsAuthenticated;
+    const csrftoken = useContext(AuthContext).csrftoken;
 
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');

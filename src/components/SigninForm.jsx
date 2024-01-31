@@ -2,15 +2,16 @@ import { useState, useContext } from "react"
 import { FaLock, FaUser } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import getCookie from "./csrfToken";
+// import csrftoken from "./csrfToken";
 import AuthContext from "./AuthContext";
 
-const csrftoken = getCookie('csrftoken');
+// const csrftoken = getCookie('csrftoken');
 
 const SigninForm = () => {
 
     const navigate = useNavigate();
     const setIsAuthenticated = useContext(AuthContext).setIsAuthenticated;
+    const csrftoken = useContext(AuthContext).csrftoken;
 
     // const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
@@ -30,10 +31,10 @@ const SigninForm = () => {
         
         const response = await axios.post('/members/signin/', formData, {headers: { 'X-CSRFToken': csrftoken }});
         if (response.data.success) {
-            console.log(response);
-            console.log(response.data);
-            console.log(response.data.user);
-            console.log(response.data.is_authenticated);
+            // console.log(response);
+            // console.log(response.data);
+            // console.log(response.data.user);
+            // console.log(response.data.is_authenticated);
             // const cookieData = response.headers['set-cookie'];
             // console.log(cookieData);
             // document.cookie = `username=${cookieData.username}`;

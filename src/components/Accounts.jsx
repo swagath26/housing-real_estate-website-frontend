@@ -52,7 +52,7 @@ import RegisterForm from "./RegisterForm";
 
 const Accounts = () => {
 
-    const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
+    // const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
 
     const [navigate, setNavigate] = useState('signinform');
 
