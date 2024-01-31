@@ -1,53 +1,27 @@
 import { useState } from "react";
 import axios from "axios";
 import getCookie from './csrfToken';
+import { useNavigate } from "react-router-dom";
 
 const SellHome = () => {
+
+    const navigate = useNavigate();
+    
     const [location, setLocation] = useState('');
-    const handleLocationValue = (event) => {
-        setLocation(event.target.value);
-    }
+    const [address, setAddress] = useState('');
+    const [description, setDescription] = useState('');
+    
+    const [price, setPrice] = useState('');
+    const [bedrooms, setBedrooms] = useState('');
+    const [bathrooms, setBathrooms] = useState('');
 
-    const [society, setSociety] = useState('');
-    const handleSocietyValue = (event) => {
-        setSociety(event.target.value);
-    }
-
+    const [balcony, setBalcony] = useState(false);
+    const [area, setArea] = useState('');
     const [areaType, setAreaType] = useState('');
-    const handleAreaTypeValue = (event) => {
-        setAreaType(event.target.value);
-    }
 
-    const [availability, setAvailability] = useState('');
-    const handleAvailabilityValue = (event) => {
-        setAvailability(event.target.value);
-    }
-
-    const [balcony, setBalcony] = useState(0);
-    const handleBalconyValue = (event) => {
-        setBalcony(event.target.value);
-    }
-
-    const [area, setArea] = useState(0);
-    const handleAreaValue = (event) => {
-        setArea(event.target.value);
-    }
-
-    const [price, setPrice] = useState(0);
-    const handlePriceValue = (event) => {
-        setPrice(event.target.value);
-    }
-
-    const [bathroom, setBathroom] = useState(0);
-    const handleBathroomValue = (event) => {
-        setBathroom(event.target.value);
-    }
-
-    const [size, setSize] = useState(0);
-    const handleSizeValue = (event) => {
-        setSize(event.target.value);
-    }
-
+    const [dateOfAvailability, setDateOfAvailability] = useState('');
+    const [readyToMove, setReadyToMove] = useState(false);
+    
     const [images, setImages] = useState([]);
     const handleImageUpload = (event) => {
         const newImages = [...images, ...event.target.files]
@@ -59,55 +33,53 @@ const SellHome = () => {
 
     function clearFields() {
         setLocation('');
-        setSociety('');
+        setAddress('');
+        setDescription('');
+        setPrice('');
+        setBedrooms('');
+        setBathrooms('');
+        setBalcony(false);
+        setArea('');
         setAreaType('');
-        setAvailability('');
-        setBalcony(0);
-        setBathroom(0);
-        setSize(0);
-        setSize(0);
-        setArea(0);
+        setDateOfAvailability('');
+        setReadyToMove(false);
         setImages([]);
     }
 
-        // function getCookie(name) {
-        //     let cookieValue = null;
-        //     if (document.cookie && document.cookie !== '') {
-        //         const cookies = document.cookie.split(';');
-        //         for (let i = 0; i < cookies.length; i++) {
-        //             const cookie = cookies[i].trim();
-        //             if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        //                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        //                 break;
-        //             }
-        //         }
-        //     }
-        //     return cookieValue;
-        // }
-    
     const csrftoken = getCookie('csrftoken');
 
     const handleSubmitForm = async (event) => {
         event.preventDefault();
         const formData = new FormData();
         formData.append('location', location);
-        formData.append('society', society);
+        formData.append('address', address);
+        formData.append('description', description);
+
+        formData.append('price', price);
+        formData.append('bedrooms', bedrooms);
+        formData.append('bathrooms', bathrooms);
+
+        formData.append('balcony', balcony);
         formData.append('area', area);
         formData.append('area_type', areaType);
-        formData.append('availability', availability);
-        formData.append('size', size);
-        formData.append('price', price);
-        formData.append('bathrooms', bathroom);
-        formData.append('balcony', balcony);
+
+        formData.append('date_of_availability', dateOfAvailability);
+        formData.append('ready_to_move', readyToMove);
+        
         images.forEach((image, index) => {
             formData.append('images', image, `images[${index}]`);
         });
+        
+        for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+          }
+
         try {
             const response = await axios.post('/add/', formData, {headers: { 'X-CSRFToken': csrftoken }});
             console.log(response);
             setSuccessMessage(response.data.message);
             setErrorMessage(null);
-            clearFields();
+            navigate('/sell_home')
         }
         catch (error) {
             setErrorMessage(error.response.data.errors || 'Something went wrong!')
@@ -115,33 +87,53 @@ const SellHome = () => {
         }
     }
 
-    const SellHomeForm = () => {
-        return (
+    
+    return (
+        <div>
+            <h1>Add your property</h1><br/>
             <form>
+                <div className="row p-2">
+                    <div className="col-auto">
+                    <label htmlFor="address" className="col-form-label">Address</label>
+                    </div>
+                    <div className="col-auto">
+                    <input type="text" className="form-control" placeholder="Enter property address" id="address" onChange={(event) => {setAddress(event.target.value)}} required/>
+                    </div>
+                </div>
+
                 <div className="row p-2">
                     <div className="col-auto">
                     <label htmlFor="location" className="col-form-label">Location</label>
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Enter your location" id="location" value={location} onChange={handleLocationValue}/>
+                    <input type="text" className="form-control" placeholder="Enter your location" id="location" onChange={(event) => {setLocation(event.target.value)}} required/>
                     </div>
                 </div>
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="society" className="col-form-label">Society</label>
+                    <label htmlFor="description" className="col-form-label">Description</label>
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Enter society name" id="society" value={society} onChange={handleSocietyValue}/>
+                    <input type="text" className="form-control" placeholder="Description of your property" id="description" onChange={(event) => {setDescription(event.target.value)}}/>
                     </div>
                 </div>
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="size" className="col-form-label">Bedrooms</label>
+                    <label htmlFor="price" className="col-form-label">Price</label>
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Number of bedrooms" id="size" value={size} onChange={handleSizeValue}/>
+                    <input type="text" className="form-control" placeholder="Price" id="price" onChange={(event) => {setPrice(event.target.value)}} required/>
+                    </div>
+                </div>
+
+                <div className="row p-2">
+                    <div className="col-auto">
+                    <label htmlFor="bedrooms" className="col-form-label">Bedrooms</label>
+                    </div>
+                    <div className="col-auto">
+                    <input type="text" className="form-control" placeholder="Number of bedrooms" id="bedrooms" onChange={(event) => {setBedrooms(event.target.value)}} required/>
                     </div>
                 </div>
 
@@ -150,7 +142,25 @@ const SellHome = () => {
                     <label htmlFor="bathrooms" className="col-form-label">Bathrooms</label>
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Number of bathrooms" id="bathrooms" value={bathroom} onChange={handleBathroomValue}/>
+                    <input type="text" className="form-control" placeholder="Number of bathrooms" id="bathrooms" onChange={(event) => {setBathrooms(event.target.value)}} required/>
+                    </div>
+                </div>
+
+                <div className="row p-2">
+                    <div className="col-auto">
+                    <label htmlFor="balcony" className="col-form-label">Balcony</label>
+                    </div>
+                    <div className="col-auto">
+                    <input type="checkbox" id="balcony" onChange={(event) => {setBalcony(event.target.checked)}}/>
+                    </div>
+                </div>
+
+                <div className="row p-2">
+                    <div className="col-auto">
+                    <label htmlFor="area" className="col-form-label">Area in sqft</label>
+                    </div>
+                    <div className="col-auto">
+                    <input type="text" className="form-control" placeholder="Area in sqft" id="area" onChange={(event) => {setArea(event.target.value)}}/>
                     </div>
                 </div>
 
@@ -159,53 +169,47 @@ const SellHome = () => {
                     <label htmlFor="area_type" className="col-form-label">Type of Area</label>
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Type of Area" id="area_type" value={areaType} onChange={handleAreaTypeValue}/>
+                    <input type="text" className="form-control" placeholder="Type of Area" id="area_type" onChange={(event) => {setAreaType(event.target.value)}}/>
                     </div>
                 </div>
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="area" className="col-form-label">Area</label>
+                    <label htmlFor="date_of_availability" className="col-form-label">Date of Availability</label>
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Area in sqft" id="area" value={area} onChange={handleAreaValue}/>
+                    <input type="date" className="form-control" id="date_of_availability" onChange={(event) => {setDateOfAvailability(event.target.value)}}/>
                     </div>
                 </div>
 
-                <label htmlFor="availability">Availability</label>
-                <input type="text" id="availability" value={availability} onChange={handleAvailabilityValue}></input><br/>
+                <div className="row p-2">
+                    <div className="col-auto">
+                    <label htmlFor="ready_to_move" className="col-form-label">Ready To Move</label>
+                    </div>
+                    <div className="col-auto">
+                    <input type="checkbox" id="ready_to_move" onChange={(event) => {setReadyToMove(event.target.checked)}}/>
+                    </div>
+                </div>
 
-                <label htmlFor="balcony">Balcony</label>
-                <input type="number" id="balcony" value={balcony} onChange={handleBalconyValue}></input><br/>
+                <div className="row p-2">
+                    <div className="col-auto">
+                    <label htmlFor="images" className="col-form-label">Upload Images</label>
+                    </div>
+                    <div className="col-auto">
+                    <input type="file" multiple className="form-control" id="images" onChange={handleImageUpload}/>
+                    </div>
+                </div>
 
-                <label htmlFor="price">Price</label>
-                <input type="number" id="price" value={price} onChange={handlePriceValue}></input><br/>
-
-                <label htmlFor="image">Upload Image</label>
-                <input type="file" id="images" multiple onChange={handleImageUpload}></input><br/><br/>
-    
                 {errorMessage && <div>{errorMessage}</div>}
                 {successMessage && <div>{successMessage}Uploaded</div>}
 
                 <div className="row p-2 g-2">
                     <div className="col-auto">
-                    <input type="checkbox" className="form-check-input" id="rememberme" />
-                    </div>
-                    <div className="col-auto">
-                    <label htmlFor="rememberme" className="form-check-label">Remember me</label>
-                    </div>
-                    <div className="col-auto">
-                    <button type="submit" className="btn btn-primary" onClick={handleSubmitForm}>Add</button>
+                    <button type="submit" className="btn btn-primary" onClick={handleSubmitForm}>Add Property</button>
                     </div>
                 </div>
                 
             </form>
-        )
-    }
-    return (
-        <div>
-            <h1>Add your property</h1><br/>
-            <SellHomeForm />
         </div>
     )
 }

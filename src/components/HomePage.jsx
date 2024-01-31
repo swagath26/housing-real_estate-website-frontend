@@ -1,10 +1,13 @@
 // import React, { useState, useEffect } from 'react'; 
 import { Link } from 'react-router-dom';
+import AuthContext from './AuthContext';
+import { useContext } from 'react';
 // import FeaturedProperties from './FeaturedProperties';
 // import SearchBar from './SearchBar';
 
 const Homepage = () => {
-  // ... rest of your code remains unchanged
+  
+  const user = useContext(AuthContext).user;
 
   return (
     <div className="container-fluid homepage"> {/* Wrap in container for responsiveness */}

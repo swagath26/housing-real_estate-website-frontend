@@ -10,28 +10,40 @@ const csrftoken = getCookie('csrftoken');
 const SigninForm = () => {
 
     const navigate = useNavigate();
-    const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
+    const setIsAuthenticated = useContext(AuthContext).setIsAuthenticated;
 
-    const [email, setEmail] = useState('');
+    // const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [remember, setRemember] = useState(false);
+    const [rememberme, setRememberme] = useState(false);
 
+    const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
     // const [successMessage, setSuccessMessage] = useState(null);
 
     const handleSignin = async (event) => {
         event.preventDefault();
         const formData = new FormData();
-        formData.append('email', email);
+        formData.append('username', username);
         formData.append('password', password);
-        formData.append('remember', remember);
+        formData.append('remember_me', rememberme);
         
         const response = await axios.post('/members/signin/', formData, {headers: { 'X-CSRFToken': csrftoken }});
         if (response.data.success) {
+            console.log(response);
+            console.log(response.data);
+            console.log(response.data.user);
+            console.log(response.data.is_authenticated);
+            // const cookieData = response.headers['set-cookie'];
+            // console.log(cookieData);
+            // document.cookie = `username=${cookieData.username}`;
+            // document.cookie = `signedin_status=${cookieData.signedin}`;
+            // document.cookie = `remember_me=${cookieData.remember_me}`;
             setIsAuthenticated(true);
             navigate('/');
         }
         else {
+            setError(true);
             setErrorMessage(response.data.messages || 'Something went wrong');
             setIsAuthenticated(false);
         }
@@ -43,19 +55,17 @@ const SigninForm = () => {
 
             {/* {(!isAuthenticated) &&  */}
             <div className="card mt-4">
-                {errorMessage}
+                {error && errorMessage}
                 <form>
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="email" className="col-form-label">Email</label>
+                    <label htmlFor="username" className="col-form-label">Username</label>
                     </div>
                     <div className="col-auto g-1">
                     <FaUser className="icon" />
                     </div>
                     <div className="col-auto">
-                    <input type="email" className="form-control" placeholder="Enter your email" id="email" value={email} onChange={(event) => setEmail(event.target.value)} aria-describedby="emailHelp"/>
-                    </div>
-                    <div id="emailHelp" className="form-text">We will never share your email with anyone else.
+                    <input type="text" className="form-control" placeholder="Enter your username" id="username" onChange={(event) => setUsername(event.target.value)} />
                     </div>
                 </div>
 
@@ -67,14 +77,14 @@ const SigninForm = () => {
                     <FaLock className="icon" />
                     </div>
                     <div className="col-auto">
-                    <input type="password" className="form-control" placeholder="Enter your password" id="password" value={password} onChange={(event) => setPassword(event.target.value)} aria-describedby="passwordHelp"/>
+                    <input type="password" className="form-control" placeholder="Enter your password" id="password" onChange={(event) => setPassword(event.target.value)} aria-describedby="passwordHelp"/>
                     </div>
                     <div id="passwordHelp" className="form-text">Never share your passwords with anyone</div>
                 </div>
 
                 <div className="row p-2 g-2">
                     <div className="col-auto">
-                    <input type="checkbox" className="form-check-input" id="rememberme" onChange={(event) => {setRemember(event.target.value)}} />
+                    <input type="checkbox" className="form-check-input" id="rememberme" onChange={(event) => {setRememberme(event.target.checked)}} />
                     </div>
                     <div className="col-auto">
                     <label htmlFor="rememberme" className="form-check-label">Remember me</label>

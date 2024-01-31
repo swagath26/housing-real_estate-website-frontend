@@ -13,6 +13,7 @@ import About from './About';
 import ForgotPasswordPage from './ForgotPasswordPage';
 import Accounts from './Accounts';
 import SignoutPage from './SignoutPage';
+import PropertyDetails from './PropertyDetails';
 
 const Layout = () => {
 
@@ -37,6 +38,7 @@ const Layout = () => {
             <Route path='/accounts' element={<Accounts />} />
             <Route path='/signout' element={<SignoutPage />} />
             <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+            <Route path='/property_details/:property_id' element={<PropertyDetails />}/>
           </Routes>
         </main>
         <Footer />

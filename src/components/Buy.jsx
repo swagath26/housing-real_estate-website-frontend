@@ -51,14 +51,18 @@ const Buy = () => {
           page_size: pageSize,
           search: searchQuery,
           // location: filteredLocation,
-          min_price: minPriceFilter,
-          max_price: maxPriceFilter,
+          // min_price: minPriceFilter,
+          // max_price: maxPriceFilter,
           // size: filteredSize,
           ordering: sortBy,
         },
       });
-      setPageCount(Math.trunc(response.data.count/pageSize) + 1);
-      setProperties(response.data.results);
+      // setPageCount(Math.trunc(response.data.count/pageSize) + 1);
+      setPageCount(1);
+      // const responseData = JSON.parse(response.data.data)
+      // console.log(responseData)
+      // setProperties(responseData);
+      setProperties(response.data);
       setIsLoading(false);
     }
     catch (error) {
@@ -223,6 +227,19 @@ const Buy = () => {
               <button className='btn btn-primary' onClick={handleNextpage}>Next</button>
             </div>
           </div>
+
+          {/* <div className='row p-1'>
+            {isLoading && <p>Loading properties...</p>}
+            {error && <p>Error: {error.message}</p>}
+            {!isLoading && properties.length > 0 && (
+              <div className='row g-2'>
+                {properties.map((property) => (
+                    <PropertyCard key={property.pk} property={property.fields} />
+                ))}
+              </div>
+            )}
+            {!isLoading && properties.length === 0 && <p>No properties found.</p>}
+          </div> */}
 
           <div className='row p-1'>
             {isLoading && <p>Loading properties...</p>}

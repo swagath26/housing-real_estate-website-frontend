@@ -6,7 +6,7 @@ import AuthContext from './AuthContext';
 
 const Header = () => {
 
-  const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
+  const isAuthenticated = useContext(AuthContext).isAuthenticated;
 
   return (
     <header className="header">
