@@ -18,12 +18,8 @@ import EditProperty from './EditProperty';
 
 const Layout = () => {
 
-  // const AuthContext = createContext();
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   return (
     <div>
-      {/* <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}> */}
       <Router>
         <Header />
         <main>
@@ -45,7 +41,6 @@ const Layout = () => {
         </main>
         <Footer />
       </Router>
-      {/* </AuthContext.Provider> */}
     </div>
   );
 };

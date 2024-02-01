@@ -1,5 +1,4 @@
-import React, { Component, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const PropertyCard = ({ property }) => {

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropertyCard from './PropertyCard';
-// import fetchProperties from './FetchProperties';
 import axios from 'axios';
 import {Box} from '@mui/material';
 import {Slider} from '@mui/material';
@@ -99,37 +98,6 @@ const Buy = () => {
     setMaxPriceFilter(max);
   }
 
-  // const handleMaxPriceFilterChange = () => {
-  //   setMaxPriceFilter(maxPriceFilterInputRef.current.value);
-  // }
-
-  // const handleSortChange = (val) => {
-  //   setSortBy(val);
-  // }
-
-  // useEffect(() => {
-  //   fetch('http://127.0.0.1:8000/list/')
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       setProperties(data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch(error => {
-  //       setError(error);
-  //       setIsLoading(false);
-  //     });
-  // }, []);
-
-  // const [filters, setFilters] = useState({});
-
-  // const handlePriceFilterChange = (event) => {
-  //   setFilters({ ...filters, priceRange: event.target.value });
-  // }
-
-  // const handlePageClick = (data) => {
-  //   const newPage = (data.selected*propertyPerPage) % properties.length;
-  //   setCurrentPage(data.selected + 1);
-  // };
   const SearchBox = () => {
     return (
       <div className='input-group mb-3'>
@@ -156,7 +124,7 @@ const Buy = () => {
     )
   }
 
-  const FilterBox = () => {
+  const PriceFilterBox = () => {
     return (
       <div className='card filter-card'>
         <div className='card-header'>
@@ -165,7 +133,7 @@ const Buy = () => {
         <div className='card-body'>
           <div className='filter-group'>
             <h6>Price Range (in Lakhs) :</h6>
-            <Box sx={{ width: 300}}>
+            <Box sx={{ width: 250}}>
               <Slider
                 value={[minPriceFilter, maxPriceFilter]}
                 min={0}
@@ -175,35 +143,56 @@ const Buy = () => {
               />
             </Box>
             <span className='range-labels'>
-              <span>Properties in {minPriceFilter}</span> - <span>{maxPriceFilter} Lakhs</span>
+              <span>Properties in INR {minPriceFilter} - {maxPriceFilter}</span>
             </span>
-            {/* <div className='filter-group'></div> */}
           </div>
         </div>
       </div>
     )
   }
   
-  return (
-    <div className='container'>
+  const AreaFilterBox = () => {
+    return (
+      <div className='card filter-card'>
+        <div className='card-body'>
+          <div className='filter-group'>
+            <h6>Area Range (in sqft) :</h6>
+            <Box sx={{ width: 250}}>
+              <Slider
+                value={[minPriceFilter, maxPriceFilter]}
+                min={0}
+                max={1000}
+                // onChange={handlePriceFilterChange}
+                valueLabelDisplay='auto'
+              />
+            </Box>
+            <span className='range-labels'>
+              <span>Properties in {minPriceFilter}</span> - <span>{maxPriceFilter} sqft</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-      <div className='row text-center'>
-        {/* <h1>humm</h1> */}
+  return (
+    <div className='container-fluid'>
+
+      <div className="row px-4">
+        <SearchBox/>
       </div>
 
-      <div className="row">
-
+      <div className='row'>
         <div className="col-md-4">
-          <div className='row'>
-            <SearchBox/>
+          <div className='row p-2 px-4'>
+            <PriceFilterBox/>
           </div>
-          <div className='row'>
-            <FilterBox/>
+          <div className='row p-2 px-4'>
+            <AreaFilterBox/>
           </div>
-          
         </div>
 
-        <div className='col-md-8' style={{height:'100vh', overflowY:'scroll'}}>
+        <div className='col-md-8' style={{height:'65vh', overflowY:'scroll'}}>
           <div className='row g-2 p-2'>
             <div>
               <b>Homes for sale</b>
