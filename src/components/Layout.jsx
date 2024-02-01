@@ -14,6 +14,7 @@ import ForgotPasswordPage from './ForgotPasswordPage';
 import Accounts from './Accounts';
 import SignoutPage from './SignoutPage';
 import PropertyDetails from './PropertyDetails';
+import EditProperty from './EditProperty';
 
 const Layout = () => {
 
@@ -39,6 +40,7 @@ const Layout = () => {
             <Route path='/signout' element={<SignoutPage />} />
             <Route path='/forgot-password' element={<ForgotPasswordPage />} />
             <Route path='/property_details/:property_id' element={<PropertyDetails />}/>
+            <Route path='/edit-property/:property_id' element={<EditProperty />} />
           </Routes>
         </main>
         <Footer />

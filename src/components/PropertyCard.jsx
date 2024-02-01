@@ -42,7 +42,7 @@ const PropertyCard = ({ property }) => {
             {property.bedrooms} bds | {property.bathrooms} ba{property.balcony && ' | Balcony'} | {property.area || '--'} sqft | {property.area_type}
             <br />
             {property.address}, {property.location}
-            <p style={{fontSize:'14px'}}>Listing by: {property.owner} | {property.availability || (property.ready_to_move && 'Ready To Move')}</p>
+            <p style={{fontSize:'14px'}}>Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}</p>
           </p>
         </div>
       </div>

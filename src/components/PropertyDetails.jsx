@@ -1,14 +1,16 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import PropertyCard from "./PropertyCard";
+import { useEffect, useState, useContext } from "react";
+import { Link, useParams } from "react-router-dom";
+import AuthContext from "./AuthContext";
 
 const PropertyDetails = () => {
+    const username = useContext(AuthContext).username;
     const params = useParams()
     const property_id = params.property_id;
     // console.log(property_id)
     const [property, setProperty] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isOwner, setIsOwner] = useState(false);
 
     const fetchProperty = async () => {
         try {
@@ -19,6 +21,7 @@ const PropertyDetails = () => {
             });
             setProperty(response.data[0]);
             setIsLoading(false);
+            setIsOwner(response.data[0].username == username)
         }
         catch (error) {
             setIsLoading(false);
@@ -35,14 +38,16 @@ const PropertyDetails = () => {
             {isLoading && <p>Loading properties...</p>}
             {!isLoading && 
             <div className="container">
+                {isOwner && 
                 <div className="row">
                     <div className="col-4">
                         <button className="btn btn-danger">Delete post</button>
                     </div>
                     <div className="col-4">
-                        <button className="btn btn-primary">Edit post</button>
+                        <Link to={`/edit-property/${property_id}`}> <button className="btn btn-primary">Edit post</button></Link>
                     </div>
                 </div>
+                }
 
                 <div className='row'>
 
@@ -65,7 +70,7 @@ const PropertyDetails = () => {
                         </div>
                         <div className="col-4">
                         {property.address}, {property.location}
-                        <p style={{fontSize:'14px'}}>Listing by: {property.owner} | {property.availability || (property.ready_to_move && 'Ready To Move')}</p>
+                        <p style={{fontSize:'14px'}}>Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}</p>
                     
                     </div>
                 </div>

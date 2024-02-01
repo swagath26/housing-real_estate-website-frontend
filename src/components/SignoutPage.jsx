@@ -1,4 +1,4 @@
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "./AuthContext";
@@ -6,7 +6,19 @@ import AuthContext from "./AuthContext";
 const SignoutPage = () => {
 
     const navigate = useNavigate();
-    const {isAuthenticated, setIsAuthenticated} = useContext(AuthContext);
+    const setIsAuthenticated = useContext(AuthContext).setIsAuthenticated;
+    const userid = useContext(AuthContext).userid;
+    const [FirstName, setFirstName] = useState('');
+    const [LastName, setLastName] = useState('');
+
+    useEffect(() =>{
+        const getUser = async () => {
+            const response = await axios.get('/members/get-user/');
+            setFirstName(response.data.first_name);
+            setLastName(response.data.last_name);
+        }
+        getUser();
+    },[]);
 
     const handleSignout = async () => {
         const response = await axios.get('/members/signout/');
@@ -20,6 +32,7 @@ const SignoutPage = () => {
     return (
         <div className="card mt-4">
             <div className="row p-2">
+                <b>Hello {FirstName} {LastName}</b>
                 <p>You are signed in currently..</p>
             </div>
             <div className="row p-2">

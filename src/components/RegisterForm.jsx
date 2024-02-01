@@ -20,7 +20,7 @@ const RegisterForm = () => {
     const [lastName, setlastName] = useState('');
     const [password1, setPassword1] = useState('');
     const [password2, setPassword2] = useState('');
-    const [remember, setRemember] = useState(false);
+    const [rememberme, setRememberme] = useState(false);
 
     const [errorMessage, setErrorMessage] = useState(false);
     // const [successMessage, setSuccessMessage] = useState(null);
@@ -34,7 +34,7 @@ const RegisterForm = () => {
         formData.append('username', username);
         formData.append('password1', password1);
         formData.append('password2', password2);
-        // formData.append('remember', remember);
+        formData.append('remember_me', rememberme);
         
         // for (const [key, value] of formData.entries()) {
         //     console.log(`${key}: ${value}`);
@@ -44,7 +44,7 @@ const RegisterForm = () => {
         console.log(response);
         if (response.data.success) {
             // setSuccessMessage(response.data.messages);
-            setErrorMessage(false);
+            // setErrorMessage(false);
             setIsAuthenticated(true);
             navigate('/');
         }
@@ -52,7 +52,7 @@ const RegisterForm = () => {
             setErrorMessage(true);
             setIsAuthenticated(false);
             // console.log(response.data.errors);
-            console.log(errorMessage)
+            // console.log(errorMessage)
         }
     }
 
@@ -137,7 +137,7 @@ const RegisterForm = () => {
 
                 <div className="row p-2 g-2">
                     <div className="col-auto">
-                    <input type="checkbox" className="form-check-input" id="rememberme" onChange={(event) => {setRemember(event.target.checked)}} />
+                    <input type="checkbox" className="form-check-input" id="rememberme" onChange={(event) => {setRememberme(event.target.checked)}} />
                     </div>
                     <div className="col-auto">
                     <label htmlFor="rememberme" className="form-check-label">Remember me</label>

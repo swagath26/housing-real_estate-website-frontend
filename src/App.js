@@ -3,22 +3,25 @@ import Layout from './components/Layout';
 import AuthContext from './components/AuthContext';
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import getCookie from './components/getCookie';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const [username, setUsername] = useState(null);
   const [csrftoken, setCsrftoken] = useState(null);
 
   useEffect(() => {
-    const isAuthCookie = Cookies.get('is_authenticated');
-    const userCookie = Cookies.get('user');
+    const isAuthCookie = getCookie('is_authenticated');
+    const usernameCookie = getCookie('username');
+    // const userCookie = Cookies.get('user');
+    // const userCookie = JSON.parse(userCookieString);
     // const csrftokenCookie = Cookies.get('csrftoken');
 
     // console.log(csrftokenCookie);
 
     if (isAuthCookie) {
       setIsAuthenticated(true);
-      setUser(userCookie);
+      setUsername(usernameCookie);
     }
   }, [isAuthenticated]);
 
@@ -31,7 +34,7 @@ function App() {
   }, [isAuthenticated]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, user, setUser, csrftoken }}>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, username, csrftoken }}>
       <Layout />
     </AuthContext.Provider>
   );
