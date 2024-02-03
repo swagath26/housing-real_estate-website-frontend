@@ -29,7 +29,7 @@ const SigninForm = () => {
         formData.append('password', password);
         formData.append('remember_me', rememberme);
         
-        const response = await axios.post('/members/signin/', formData, {headers: { 'X-CSRFToken': csrftoken }});
+        const response = await axios.post('/api/members/signin/', formData, {headers: { 'X-CSRFToken': csrftoken }});
         if (response.data.success) {
             // console.log(response);
             // console.log(response.data);

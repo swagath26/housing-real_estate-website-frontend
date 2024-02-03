@@ -106,7 +106,7 @@ const EditProperty = () => {
         //     console.log(`${key}: ${value}`);
         //   }
 
-        const response = await axios.post('/edit/', formData, {headers: { 'X-CSRFToken': csrftoken }});
+        const response = await axios.post('/api/edit/', formData, {headers: { 'X-CSRFToken': csrftoken }});
         console.log(response);
 
         if (response.data.success) {

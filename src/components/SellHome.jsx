@@ -75,7 +75,7 @@ const SellHome = () => {
           }
 
         try {
-            const response = await axios.post('/add/', formData, {headers: { 'X-CSRFToken': csrftoken }});
+            const response = await axios.post('/api/add/', formData, {headers: { 'X-CSRFToken': csrftoken }});
             console.log(response);
             setSuccessMessage(response.data.message);
             setErrorMessage(null);

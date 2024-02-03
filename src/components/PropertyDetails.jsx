@@ -14,7 +14,7 @@ const PropertyDetails = () => {
 
     const fetchProperty = async () => {
         try {
-            const response = await axios.get('/properties_list/', {
+            const response = await axios.get('/api/properties_list/', {
                 params: {
                     id : property_id,
                 },

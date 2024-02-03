@@ -41,7 +41,7 @@ const RegisterForm = () => {
         //     console.log(`${key}: ${value}`);
         // }
 
-        const response = await axios.post('/members/signup/', formData, {headers: { 'X-CSRFToken': csrftoken }});
+        const response = await axios.post('/api/members/signup/', formData, {headers: { 'X-CSRFToken': csrftoken }});
         console.log(response);
         if (response.data.success) {
             // setSuccessMessage(response.data.messages);

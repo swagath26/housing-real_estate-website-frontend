@@ -13,7 +13,7 @@ const SignoutPage = () => {
 
     useEffect(() =>{
         const getUser = async () => {
-            const response = await axios.get('/members/get-user/');
+            const response = await axios.get('/api/members/get-user/');
             setFirstName(response.data.first_name);
             setLastName(response.data.last_name);
         }
@@ -21,7 +21,7 @@ const SignoutPage = () => {
     },[]);
 
     const handleSignout = async () => {
-        const response = await axios.get('/members/signout/');
+        const response = await axios.get('/api/members/signout/');
         console.log(response);
         if (response.data.success) {
             setIsAuthenticated(false);
