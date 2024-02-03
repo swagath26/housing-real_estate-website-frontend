@@ -55,11 +55,11 @@ const SigninForm = () => {
             {/* {isAuthenticated && navigate('/signout')} */}
 
             {/* {(!isAuthenticated) &&  */}
-            <div className="card mt-4">
+            <div className="card bg-transparent">
                 {error && errorMessage}
                 <form>
                 <div className="row p-2">
-                    <div className="col-auto">
+                    <div className="col-3">
                     <label htmlFor="username" className="col-form-label">Username</label>
                     </div>
                     <div className="col-auto g-1">
@@ -71,7 +71,7 @@ const SigninForm = () => {
                 </div>
 
                 <div className="row p-2">
-                    <div className="col-auto">
+                    <div className="col-3">
                     <label htmlFor="password" className="col-form-label">Password</label>
                     </div>
                     <div className="col-auto g-1">

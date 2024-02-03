@@ -1,5 +1,3 @@
-import { Link} from "react-router-dom";
-import { Routes, Route } from 'react-router-dom';
 import { useContext, useState } from "react";
 import SigninForm from "./SigninForm";
 import AuthContext from "./AuthContext";
@@ -45,9 +43,6 @@ import RegisterForm from "./RegisterForm";
 //         </div>
 //     )
 // }
-
-
-
 
 
 const Accounts = () => {

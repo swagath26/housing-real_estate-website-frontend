@@ -3,17 +3,23 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from './AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const Header = () => {
 
   const isAuthenticated = useContext(AuthContext).isAuthenticated;
 
+  const location = useLocation();
+  if ((location.pathname == '/' || location.pathname == '')) {
+    return null;
+  }
+
   return (
     <header className="header">
-      <nav className="navbar navbar-expand-md py-0">
+    <nav className="navbar navbar-expand-md py-0">
         <div className='container-fluid'>
           <Link to="/" className="navbar-brand px-3">
-            <img src="/img/logo.png" alt="Housing Logo" width="75" />
+            <img src="/img/logo.png" alt="Housing Logo" width="70" />
           </Link>
           <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
             <FontAwesomeIcon icon={faBars} />

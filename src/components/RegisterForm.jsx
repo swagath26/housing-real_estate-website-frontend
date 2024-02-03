@@ -1,5 +1,6 @@
 import { useState, useContext } from "react"
 import { FaLock, FaUser } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 // import getCookie from "./csrfToken";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -58,17 +59,17 @@ const RegisterForm = () => {
 
     return (
         
-            <div className="card mt-4">
+            <div className="card bg-transparent">
                 {errorMessage && 
                 'Something went wrong'
                 }
                 <form>
                 <div className="row p-2">
-                    <div className="col-auto">
+                    <div className="col-2">
                     <label htmlFor="email" className="col-form-label">Email</label>
                     </div>
                     <div className="col-auto g-1">
-                    <FaUser className="icon" />
+                    <MdEmail className="icon" />
                     </div>
                     <div className="col-auto">
                     <input type="email" className="form-control" placeholder="Enter your email" id="email" onChange={(event) => setEmail(event.target.value)} aria-describedby="emailHelp"/>
@@ -77,22 +78,20 @@ const RegisterForm = () => {
                 </div>
 
                 <div className="row p-2">
-                    <div className="col-auto">
+                    <div className="col-3">
                     <label htmlFor="username" className="col-form-label">Username</label>
                     </div>
                     <div className="col-auto g-1">
                     <FaUser className="icon" />
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Provide a username for your account" id="username" onChange={(event) => setUsername(event.target.value)}/>
+                    <input type="text" className="form-control" placeholder="Provide a username" id="username" onChange={(event) => setUsername(event.target.value)}/>
                     </div>
                 </div>
 
                 <div className="row p-2">
                     <div className="col-auto">
                     <label htmlFor="first_name" className="col-form-label">First Name</label>
-                    </div>
-                    <div className="col-auto g-1">
                     </div>
                     <div className="col-auto">
                     <input type="text" className="form-control" placeholder="Enter your First Name" id="first_name" onChange={(event) => setFirstName(event.target.value)}/>
@@ -103,8 +102,6 @@ const RegisterForm = () => {
                     <div className="col-auto">
                     <label htmlFor="last_name" className="col-form-label">Last Name</label>
                     </div>
-                    <div className="col-auto g-1">
-                    </div>
                     <div className="col-auto">
                     <input type="text" className="form-control" placeholder="Enter your last Name" id="last_name" onChange={(event) => setlastName(event.target.value)}/>
                     </div>
@@ -112,38 +109,38 @@ const RegisterForm = () => {
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="password1" className="col-form-label">Set Password</label>
+                    <label htmlFor="password1" className="col-form-label">Password</label>
                     </div>
                     <div className="col-auto g-1">
                     <FaLock className="icon" />
                     </div>
                     <div className="col-auto">
-                    <input type="password" className="form-control" placeholder="Enter new password" id="password1" onChange={(event) => setPassword1(event.target.value)} aria-describedby="passwordHelp"/>
+                    <input type="password" className="form-control" placeholder="Create a password" id="password1" onChange={(event) => setPassword1(event.target.value)} aria-describedby="passwordHelp"/>
                     </div>
                     <div id="passwordHelp" className="form-text">Password must be 8-20 characters long</div>
                 </div>
 
                 <div className="row p-2">
-                    <div className="col-auto">
-                    <label htmlFor="password2" className="col-form-label">Confirm Password</label>
+                    <div className="col-3">
+                        <label htmlFor="password2" className="col-form-label">Confirm Password</label>
                     </div>
                     <div className="col-auto g-1">
                     <FaLock className="icon" />
                     </div>
                     <div className="col-auto">
-                    <input type="password" className="form-control" placeholder="Enter password" id="password2" onChange={(event) => setPassword2(event.target.value)} />
+                    <input type="password" className="form-control" placeholder="Confirm password" id="password2" onChange={(event) => setPassword2(event.target.value)} />
                     </div>
                 </div>
 
-                <div className="row p-2 g-2">
+                <div className="row ps-3 g-2">
                     <div className="col-auto">
                     <input type="checkbox" className="form-check-input" id="rememberme" onChange={(event) => {setRememberme(event.target.checked)}} />
                     </div>
                     <div className="col-auto">
                     <label htmlFor="rememberme" className="form-check-label">Remember me</label>
                     </div>
-                    <div className="col-auto">
-                    <button type="submit" className="btn btn-primary" onClick={handleRegister}>Signup</button>
+                    <div className="col-6 ps-3 pb-2 mt-0 d-flex justify-content-center align-items-stretch">
+                    <button type="submit" className="btn btn-primary" onClick={handleRegister}>Register</button>
                     </div>
                 </div>
                 
