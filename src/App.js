@@ -27,7 +27,7 @@ function App() {
 
   useEffect(() => {
     const getCsrfToken = async () => {
-      const response = await axios.get('/members/get-csrftoken/');
+      const response = await axios.get('/api/members/get-csrftoken/');
       setCsrftoken(response.data.csrftoken);
     }
     getCsrfToken();
