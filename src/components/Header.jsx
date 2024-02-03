@@ -19,7 +19,7 @@ const Header = () => {
     <nav className="navbar navbar-expand-md py-0">
         <div className='container-fluid'>
           <Link to="/" className="navbar-brand px-3">
-            <img src="/img/logo.png" alt="Housing Logo" width="70" />
+            <img src="/img/logo2.png" alt="Housing Logo" width="65" />
           </Link>
           <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
             <FontAwesomeIcon icon={faBars} />
