@@ -56,12 +56,8 @@ const Buy = () => {
           ordering: sortBy,
         },
       });
-      // setPageCount(Math.trunc(response.data.count/pageSize) + 1);
-      setPageCount(1);
-      // const responseData = JSON.parse(response.data.data)
-      // console.log(responseData)
-      // setProperties(responseData);
       setProperties(response.data);
+      setPageCount(Math.trunc(properties.length/pageSize) + 1);
       setIsLoading(false);
     }
     catch (error) {
@@ -70,11 +66,6 @@ const Buy = () => {
       setIsLoading(false);
     }
   }
-
-  // const handlePageChange = (newPage) => {
-  //   setCurrentPage(newPage);
-  //   fetchProperties();
-  // };
 
   const handleNextpage = () => {
     if (currentPage < pageCount) {

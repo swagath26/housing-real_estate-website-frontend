@@ -1,23 +1,26 @@
-import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+// import Slider from 'react-slick';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from './AuthContext';
+import axios from 'axios';
+import './HomePage.css';
 
 const Header = () => {
 
   const isAuthenticated = useContext(AuthContext).isAuthenticated;
 
   return (
-    <header className="header">
+    <header className="header px-3 py-0 pt-3">
     <nav className="navbar navbar-expand-md py-0" data-bs-theme='dark'>
         <div className='container-fluid'>
-          <Link to="/" className="navbar-brand px-3 py-0 pt-2 pt-lg-3">
+          <Link to="/" className="navbar-brand">
           <div className='d-none d-lg-block'>
-              <img src="/img/logo2.png" alt="Housing Logo" width="65" />
+              <img src="/static/img/logo2.png" alt="Housing Logo" width="65" />
             </div>
             <div className='d-lg-none'>
-              <img src="/img/logo2.png" alt="Housing Logo" width="50" />
+              <img src="/static/img/logo2.png" alt="Housing Logo" width="50" />
             </div>
           </Link>
           <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -66,14 +69,161 @@ const Header = () => {
   )
 }
 
-const SearchBox = () => {
+const TopView = () => {
   return (
-    <div className='input-group'>
-      <input type='text' id='search' className='form-control' placeholder='Search by location, society, etc.' aria-label='Search' aria-describedby='search-addon'/>
-      <button className='btn btn-outline-light' type='button' id='search-addon'>
-        <i className='fas fa-search'></i>
-      </button>
-    </div>
+      <div className="view" style={{ backgroundImage: "url(/static/img/housing-bg5.jpg)", backgroundSize:'cover', backgroundRepeat:'no-repeat',  backgroundPosition: 'top'}}>
+        <Header />
+        <div className="container-fluid px-0">
+          
+          <section className="text-center text-light py-5 pt-lg-3 pt-xl-2">
+            <h1 style={{fontFamily:'serif'}} className="display-5 fw-bold">Welcome To Housing</h1>
+            <p className="fs-6 fw-light">Find your dream home with us</p>< br />< br />
+          </section>
+
+          <div class="container-fluid">
+              <div class="row text-light">
+                <div>
+                  <br /><br />
+                  <br /><br /><br /><br /><br /><br /><br /><br />
+                </div>
+                <div className='row d-flex my-3 p-5'>
+                  <div className='col-sm-1 col-lg-2 col-xl-3'></div>
+                  <div className='col-sm-10 col-lg-8 col-xl-6'>
+                    <div className='input-group'>
+                      <input type='text' id='search' className='form-control' placeholder='Search by location, society, etc.' aria-label='Search' aria-describedby='search-addon'/>
+                      <button className='btn btn-outline-light' type='button' id='search-addon'>
+                        <i className='fas fa-search'></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div className='col-sm-1 col-lg-2 xol-xl-3'></div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  )
+}
+
+const PropertyCard = ({ property }) => {
+  const IndianRupeeFormatter = new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR'
+  });
+  const navigate = useNavigate();
+  return (
+      <div className='card' style={{width:'356px'}} onClick={() => navigate(`/property_details/${property.id}`)}>
+        <div className='card-img-top'>
+          <img style={{width:'100%', height:'180px', objectFit:'cover'}} src={property.images.length > 0 && property.images[0].image} alt={`Property ${property.id}`} />
+        </div>
+      
+        <div className="card-body p-2" style={{height:'130px'}}>
+          <h5 className='card-title fw-bold'>{IndianRupeeFormatter.format(property.price)}</h5>
+          <p className='card-text' style={{fontSize:'17px'}}>
+            {property.bedrooms} bds | {property.bathrooms} ba{property.balcony && ' | Balcony'} | {property.area || '--'} sqft | {property.area_type}
+            <br />
+            {property.address}, {property.location}
+            <p style={{fontSize:'14px'}}>Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}</p>
+          </p>
+        </div>
+      </div>
+  );
+};
+
+const RecommendedSection = () => {
+
+  const [properties, setProperties] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchProperties = async () => {
+    try {
+      const response = await axios.get('/api/properties_list/', {
+        params: {
+          page: 1,
+        }
+      })
+      setProperties(response.data);
+      setIsLoading(false);
+    }
+    catch (error) {
+      console.error(error);
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const handlePreviousSlide = () => {
+    const scrollContainer = document.getElementById('property-scroll-div');
+    var scrollby = -300
+    if (scrollContainer.clientWidth >= 1320) {
+      scrollby = -1000;
+    }
+    else if (scrollContainer.clientWidth >= 960) {
+      scrollby = -600;
+    }
+    scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
+  }
+
+  const handleNextSlide = () => {
+    const scrollContainer = document.getElementById('property-scroll-div');
+    var scrollby = 300;
+    if (scrollContainer.clientWidth >= 1320) {
+      scrollby = 1000;
+    }
+    else if (scrollContainer.clientWidth >= 960) {
+      scrollby = 600;
+    }
+    scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
+  }
+
+  function updateScrollIconVisibility() {
+    const scrollContainer = document.getElementById('property-scroll-div');
+    const scrollLeftButton = document.getElementById('scroll-left-button');
+    const scrollRightButton = document.getElementById('scroll-right-button');
+
+    console.log(scrollContainer.scrollLeft);
+    console.log(scrollContainer.scrollWidth);
+    console.log(scrollContainer.clientWidth);
+  
+    const isAtLeftEdge = scrollContainer.scrollLeft < 50;
+    const isAtRightEdge = scrollContainer.scrollLeft + 50 > scrollContainer.scrollWidth - scrollContainer.clientWidth;
+  
+    scrollLeftButton.style.opacity = isAtLeftEdge ? 0.5 : 1;
+    scrollLeftButton.style.cursor = isAtLeftEdge ? 'default' : 'pointer';
+    scrollRightButton.style.opacity = isAtRightEdge ? 0.5 : 1;
+    scrollRightButton.style.pointerEvents = isAtRightEdge ? 'default' : 'pointer';
+  }
+
+  return (
+      <div class="container py-5 px-0">
+        <div className='row px-3 mx-0'>
+          <div className='col-10 col-xl-11 px-0'>
+            <h1 className='fs-3'>Homes For You</h1>
+            <p className='lead fs-6'>Based on homes you recently viewed</p>
+          </div>
+          <div className='col-2 col-xl-1 px-0 d-flex align-items-center justify-content-between'>
+            <i id='scroll-left-button' style={{opacity:'0.5'}} className='fa-solid fa-circle-chevron-left' onClick={handlePreviousSlide} />
+            <i id='scroll-right-button' style={{opacity:'1'}} className='fa-solid fa-circle-chevron-right' onClick={handleNextSlide} />
+          </div>
+        </div>
+
+        {isLoading && <p>Loading Properties...</p>}
+        {!isLoading && properties.length > 0 &&
+        <ul id='property-scroll-div' className='property-scroll-div pb-2 p-0 my-0' onScroll={updateScrollIconVisibility}>
+          {properties.map((property) => (
+            <li className='property-card-div px-3' key={property.id}>
+              <PropertyCard property={property} />
+            </li>
+          ))} 
+          <li className='property-card-div px-3'>
+            <button className='btn btn-primary'>Browse For <br/> More</button>
+          </li>
+        </ul>
+        }
+      </div>
   )
 }
 
@@ -83,38 +233,8 @@ const Homepage = () => {
 
   return (
     <div>
-      <div class="view" style={{ backgroundImage: "url(/img/housing-bg5.jpg)", backgroundRepeat:'no-repeat', backgroundSize:'cover', backgroundPosition: 'top'}}>
-        <Header />
-        <div className="container-fluid px-0">
-          
-          <section className="text-center text-light pt-0 px-md-1">
-            <h1 className="display-5 pt-3 pt-lg-2 px-2 px-md-5">Welcome to Your New Housing Assistant</h1>
-            <p className="fs-6 fw-light">Find your dream home with us.</p>
-          </section>
-
-          <div class="container-fluid">
-              <div class="row text-light">
-                <div>
-                  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-                </div>
-                <div className='row d-flex my-1 p-5 p-sm-5'>
-                  <div className='col-sm-1 col-lg-2 col-xl-3'></div>
-                  <div className='col-sm-10 col-lg-8 col-xl-6'><SearchBox /></div>
-                  <div className='col-sm-1 col-lg-2 xol-xl-3'></div>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="container">
-        <div class="row py-5">
-          <div class="col-md-12 text-center">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-          </div>
-        </div>
-      </div>
-    
+      <TopView />
+      <RecommendedSection />
 
         <section className="container main-content">
           <h2 className="mb-4">Explore Apps</h2>
@@ -147,86 +267,5 @@ const Homepage = () => {
   );
 };
 
-
-// const Homepage = () => {
-//   // const [featuredProperties, setFeaturedProperties] = useState([]);
-
-//   // useEffect(() => {
-//   //   // Fetch featured properties from Django API and set state
-//   //   fetch('/api/featured-properties')
-//   //     .then(response => response.json())
-//   //     .then(data => setFeaturedProperties(data));
-//   // }, []);
-//   const api = "http://127.0.0.1:8000" 
-//   function handleSubmit(event) {
-//     event.preventDefault();
-//     const formData = new FormData(event.target);
-//     fetch('/contact', {
-//       method: 'POST',
-//       body: formData
-//     })
-//     .then(response => {
-
-//     })
-//     .catch(error => {
-
-//     })
-//   }
-//   return (
-//     <div className="homepage">
-//       <section class="hero-banner">
-//         <h1>Welcome to Our Housing Assistant Website</h1>
-//         <p>Find your dream home with us.</p>
-//       </section>
-
-//       <section class="container main-content">
-//         <h2>Explore Apps</h2>
-//         <Link to="/price_estimator" className="app-box">House Price Estimator</Link>
-//         <br></br>
-//         <Link to="/recommend_location" className="app-box">Location Recommendation</Link>
-//       </section>
-    
-//       <section class="featured-houses">
-//         <h2>Featured Houses</h2>
-        
-//         <div class="house-card">
-//             <img src="http://127.0.0.1:8000/static/img/house1.jpeg" alt="House 1"></img>
-//             <h3>Beautiful Family Home</h3>
-//             <p>3 bedrooms | 2 bathrooms | $300,000</p>
-//         </div>
-        
-//       </section>
-
-//       <section class="faq">
-//         <h2>Frequently Asked Questions</h2>
-//         <div class="faq-item">
-//             <h3>How can I buy a house?</h3>
-//             <p>Buying a house is easy with our step-by-step guide. Explore our listings and contact us for more details.</p>
-//         </div>
-//       </section>
-
-//       <section class="contact">
-//         <h2>Contact Us</h2>
-//         <p>Have questions or need assistance? Reach out to our team!</p>
-//         <form onSubmit={handleSubmit}>
-//             <label for="name">Name:</label>
-//             <input type="text" id="name" name="name" required></input><br></br><br></br>
-//             <label for="email">Email:</label>
-//             <input type="email" id="email" name="email" required></input><br></br><br></br>
-//             <label for="message">Message:</label>
-//             <textarea id="message" name="message" rows="4" required></textarea><br></br><br></br>
-//             <button type="submit">Submit</button><br></br><br></br>
-//         </form>
-//       </section>
-
-//       <br></br>
-//       <br></br>
-//       <br></br>
-//       {/* <SearchBar /> */}
-//       {/* <FeaturedProperties properties={featuredProperties} /> */}
-//       {/* Add other sections like About Us, Call to Action buttons */}
-//     </div>
-//   );
-// };
 
 export default Homepage;

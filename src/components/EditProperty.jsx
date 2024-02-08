@@ -32,7 +32,7 @@ const EditProperty = () => {
 
     const fetchProperty = async () => {
         try {
-            const response = await axios.get('/properties_list/', {
+            const response = await axios.get('/api/properties_list/', {
                 params: {
                     id : property_id,
                 },
@@ -74,7 +74,7 @@ const EditProperty = () => {
         setAreaType(property.area_type);
         setDateOfAvailability(property.date_of_availability);
         setReadyToMove(property.ready_to_move);
-        setImages(property.images);
+        setImages([]);
     }
 
     const csrftoken = getCookie('csrftoken');

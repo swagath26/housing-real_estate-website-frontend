@@ -1,0 +1,37 @@
+.property-scroll-div::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.property-scroll-div li {
+    scroll-snap-align: start;
+}
+
+.property-scroll-div {
+    overflow-x: scroll;
+    white-space: nowrap;
+    scroll-snap-type: x mandatory;
+}
+
+.property-card-div {
+    display: inline-block;
+}
+
+.card {
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+.card:hover {
+    box-shadow: -1px 2px 10px rgba(0, 0, 0, 0.25);
+}
+.fa-circle-chevron-left {
+    font-size: 25px;
+    cursor: pointer;
+}
+.fa-circle-chevron-right {
+    font-size: 25px;
+    cursor: pointer;
+}
+/* .card:active {
+    transform: scale(0.98);
+} */

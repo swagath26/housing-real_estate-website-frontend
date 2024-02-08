@@ -4,6 +4,7 @@ import AuthContext from './components/AuthContext';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import getCookie from './components/getCookie';
+// import setupProxy from './setupProxy';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,11 +14,6 @@ function App() {
   useEffect(() => {
     const isAuthCookie = getCookie('is_authenticated');
     const usernameCookie = getCookie('username');
-    // const userCookie = Cookies.get('user');
-    // const userCookie = JSON.parse(userCookieString);
-    // const csrftokenCookie = Cookies.get('csrftoken');
-
-    // console.log(csrftokenCookie);
 
     if (isAuthCookie) {
       setIsAuthenticated(true);
@@ -32,6 +28,7 @@ function App() {
     }
     getCsrfToken();
   }, [isAuthenticated]);
+
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, username, csrftoken }}>

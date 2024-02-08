@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const PropertyCard = ({ property }) => {
   const navigate = useNavigate();
 
   return (
     <div className='col-6'>
-      {/* <Link to="/property_details"> */}
       <div className='card' onClick={() => navigate(`/property_details/${property.id}`)}>
         <div className='card-img-top d-flex justify-content-center'>
           <div id={`property_${property.id}`} class="carousel slide">
@@ -45,7 +44,6 @@ const PropertyCard = ({ property }) => {
           </p>
         </div>
       </div>
-      {/* </Link> */}
     </div>
   );
 };
