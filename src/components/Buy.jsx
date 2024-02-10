@@ -3,26 +3,12 @@ import PropertyCard from './PropertyCard';
 import axios from 'axios';
 import {Box} from '@mui/material';
 import {Slider} from '@mui/material';
-// import ReactPaginate from 'react-paginate';
-
-// function RangeSlider() {
-//   cpnst [value, setValue] = useState([0, 100]);
-//   const handleChange = (event) => {
-//     setValue();
-//   }
-// }
+import {Link} from 'react-router-dom';
+import './Buy.css';
 
 const Buy = () => {
 
   const searchInputRef = useRef(null);
-  // const minPriceFilterInputRef = useRef(null);
-  // const maxPriceFilterInputRef = useRef(null);
-  // const sortInputRef = useRef(null);
-
-  // const filteredLocation = useState('');
-  // const filteredSize = useState('');
-  // const filteredMinPrice = useState('');
-  // const filteredMaxPrice = useState('');
 
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +77,7 @@ const Buy = () => {
 
   const SearchBox = () => {
     return (
-      <div className='input-group mb-3'>
+      <div className='input-group'>
         <input type='text' ref={searchInputRef} className='form-control' placeholder='Search by location, society, etc.' aria-label='Search' aria-describedby='search-addon'/>
         <button onClick={handleSearchChange} className='btn btn-outline-secondary' type='button' id='search-addon'>
           <i className='fas fa-search'></i>
@@ -103,8 +89,8 @@ const Buy = () => {
   const SortButton = () => {
     return (
       <div className='dropdown'>
-        <button className='btn btn-secondary dropdown-toggle' type='button' id='sortDropdown' data-bs-toggle='dropdown' aria-expanded='false'>
-          Sort By
+        <button className='btn text-nowrap dropdown-toggle' type='button' id='sortDropdown' data-bs-toggle='dropdown' aria-expanded='false'>
+          Sort By {(sortBy != '') && `(${sortBy})`}
         </button>
         <ul className='dropdown-menu' aria-labelledby='sortDropdown'>
           <li><button className='dropdown-item' onClick={() => setSortBy('')}>None</button></li>
@@ -119,11 +105,10 @@ const Buy = () => {
     return (
       <div className='card filter-card'>
         <div className='card-header'>
-          <h5>Filter Properties</h5>
+          <h5>Price Range (in Lakhs) :</h5>
         </div>
         <div className='card-body'>
           <div className='filter-group'>
-            <h6>Price Range (in Lakhs) :</h6>
             <Box sx={{ width: 250}}>
               <Slider
                 value={[minPriceFilter, maxPriceFilter]}
@@ -166,60 +151,125 @@ const Buy = () => {
     )
   }
 
+
+  useEffect(() => {
+    setHeight();
+  }, []);
+
+  const setHeight = () => {
+    const searchSection = document.getElementById('search-section');
+    const listSection = document.getElementById('list-section');
+    const listHeight = window.innerHeight - (listSection.getBoundingClientRect().top - searchSection.getBoundingClientRect().top);
+    listSection.style.height = `${listHeight*1.01}px`;
+  }
+
+  window.addEventListener('shown.bs.collapse', setHeight);
+  window.addEventListener('hidden.bs.collapse', setHeight);
+
+  const [filterPrice, setFilterPrice] = useState('Price');
+  const [filterBeds, setFilterBeds] = useState('Beds & Baths');
+  const [filterArea, setFilterArea] = useState('Area');
+  const [filterCount, setFilterCount] = useState(0);
+
+  let map;
+
+  async function initMap() {
+    const google = window.google;
+    const { Map } = await google.maps.importLibrary("maps");
+
+    map = new Map(document.getElementById('map'), {
+      center: { lat: -34.397, lng: 150.644 },
+      zoom: 8,
+    });
+  }
+  useEffect(() => {
+    initMap();
+  }, []);
+
   return (
-    <div className='container-fluid'>
+    <div className='container-fluid' id='main-container'>
 
-      <div className="row px-4">
-        <SearchBox/>
-      </div>
+      <div className="row py-2 g-3 m-0" id='search-section'>
 
-      <div className='row'>
-        <div className="col-md-4">
-          <div className='row p-2 px-4'>
-            <PriceFilterBox/>
-          </div>
-          <div className='row p-2 px-4'>
-            <AreaFilterBox/>
+        <div className='col-lg-5 flex justify-content-evenly' id="search-box">
+          <div className='row'>
+            <div className='col-md-10 col-8'>
+              <SearchBox/>
+            </div>
+            <div className='col-2'>
+              <button className='btn btn-outline-dark' id='filter-toggle-button' data-bs-toggle='collapse' data-bs-target='#filter-collapse'>Filter</button>
+            </div>
+            <div className='col-2'>
+              <button className='btn btn-outline-dark' id='map-toggle-button' data-bs-toggle='collapse' data-bs-target='#map-section'>Map</button>
+            </div>
           </div>
         </div>
 
-        <div className='col-md-8' style={{height:'65vh', overflowY:'scroll'}}>
+        <div className='col-lg-7 collapse' id="filter-collapse">
+          <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+            {filterPrice}
+          </button>
+            <div className="dropdown-menu" aria-labelledby="appsDropdown">
+              <div className="dropdown-item"><PriceFilterBox/></div>
+            </div>
+          <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+            {filterBeds}
+          </button>
+            <div className="dropdown-menu" aria-labelledby="appsDropdown">
+              <div className="dropdown-item"><PriceFilterBox/></div>
+            </div>
+          <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+            {filterArea}
+          </button>
+            <div className="dropdown-menu" aria-labelledby="appsDropdown">
+              <div className="dropdown-item"><AreaFilterBox/></div>
+            </div>
+          <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+            More Filters {(filterCount > 0) && `(${filterCount})`}
+          </button>
+            <div className="dropdown-menu" aria-labelledby="appsDropdown">
+              <div className="dropdown-item"><b>More</b></div>
+            </div>
+          <button className='btn text-nowrap'>Clear Filters</button>
+        </div>
+
+      </div>
+
+      <div className='row m-0' id='content-section'>
+
+        <div className='col-xl-4 col-md-6 collapse' id='map-section'>
+          <div className='d-flex align-items-center justify-content-center'>
+            <div className='row' style={{minHeight:'80vh', minWidth:'360px', height:'85vh', width:'80vh'}} id='map'></div>
+          </div>
+        </div>
+
+        <div className='col-xl-8 col-md-6 list-section' style={{overflowY:'scroll'}} id='list-section'>
           <div className='row g-2 p-2'>
-            <div>
-              <b>Homes for sale</b>
+            <div className='col-xl-4'>
+              <div>
+                <b>Homes for sale</b>
+              </div>
+              <div>
+                Search Results
+              </div>
             </div>
-            <div className='col-md-8'>
-              Search Results
+            <div className='col-xl-4'>
+              <div className='row g-2 p-1'>
+                <div className='col-4 d-flex justify-content-end'>
+                  <button className='btn btn-primary' onClick={handlePreviousPage}>Previous</button>
+                </div>
+                <div className='col-4 d-flex flex-column justify-content-center'>
+                  <span>Page {currentPage} of {pageCount} </span>
+                </div>
+                <div className='col-4'>
+                  <button className='btn btn-primary' onClick={handleNextpage}>Next</button>
+                </div>
+              </div>
             </div>
-            <div className='col-md-4 d-flex justify-content-center'>
+            <div className='col-xl-4 d-flex justify-content-center'>
               <SortButton />
             </div>
           </div>
-
-          <div className='row g-2 p-1'>
-            <div className='col-5 d-flex justify-content-end'>
-              <button className='btn btn-primary' onClick={handlePreviousPage}>Previous</button>
-            </div>
-            <div className='col-2 d-flex flex-column justify-content-center'>
-              <span>Page {currentPage} of {pageCount} </span>
-            </div>
-            <div className='col-5'>
-              <button className='btn btn-primary' onClick={handleNextpage}>Next</button>
-            </div>
-          </div>
-
-          {/* <div className='row p-1'>
-            {isLoading && <p>Loading properties...</p>}
-            {error && <p>Error: {error.message}</p>}
-            {!isLoading && properties.length > 0 && (
-              <div className='row g-2'>
-                {properties.map((property) => (
-                    <PropertyCard key={property.pk} property={property.fields} />
-                ))}
-              </div>
-            )}
-            {!isLoading && properties.length === 0 && <p>No properties found.</p>}
-          </div> */}
 
           <div className='row p-1'>
             {isLoading && <p>Loading properties...</p>}
@@ -227,28 +277,25 @@ const Buy = () => {
             {!isLoading && properties.length > 0 && (
               <div className='row g-2'>
                 {properties.map((property) => (
+                  <div className='col-lg-12 col-xl-6 col-xxl-4 d-flex justify-content-center'>
                     <PropertyCard key={property.id} property={property} />
+                  </div>
                 ))}
               </div>
             )}
             {!isLoading && properties.length === 0 && <p>No properties found.</p>}
           </div>
+
+          <footer className="footer py-2 bg-light mt-auto">
+            <div className="container">
+              <p className="text-center text-muted">&copy; 2023 Your Housing Website</p>
+              <Link to="/contact" className="footer-link text-center text-decoration-none">Contact Us</Link>
+            </div>
+          </footer>
         
         </div>
         
       </div>
-      
-      {/* <ReactPaginate
-        previousLabel={'< Previous'}
-        nextLabel={'Next >'}
-        breakLabel={<a href="">...</a>}
-        pageCount={pageCount}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={5}
-        onPageChange={handlePageChange}
-        containerClassname={'pagination'}
-        activeClassName={'active'}
-      /> */}
       
     </div>
   );

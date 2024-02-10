@@ -16,12 +16,13 @@ const Header = () => {
 
   return (
     <header className="header">
+
     <nav className="navbar navbar-expand-md py-0">
         <div className='container-fluid'>
           <Link to="/" className="navbar-brand px-3">
-            <img src="/static/img/logo.png" alt="Housing Logo" width="70" />
+            <img src="/static/img/logo.png" alt="Housing Logo" width="65" />
           </Link>
-          <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+          <button className="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
             <FontAwesomeIcon icon={faBars} />
           </button>
           <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby='offcanvasNavbarLabel'>

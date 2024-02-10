@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from './AuthContext';
 import axios from 'axios';
-import './HomePage.css';
+import './HomePage.css'; 
 
 const Header = () => {
 
@@ -13,36 +13,37 @@ const Header = () => {
 
   return (
     <header className="header px-3 py-0 pt-3">
-    <nav className="navbar navbar-expand-md py-0" data-bs-theme='dark'>
+      <nav className="navbar navbar-expand-md py-0" data-bs-theme='dark'>
         <div className='container-fluid'>
+
           <Link to="/" className="navbar-brand">
-          <div className='d-none d-lg-block'>
+            <div className='d-none d-lg-block'>
               <img src="/static/img/logo2.png" alt="Housing Logo" width="65" />
             </div>
             <div className='d-lg-none'>
               <img src="/static/img/logo2.png" alt="Housing Logo" width="50" />
             </div>
           </Link>
-          <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+
+          <button className="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar">
             <FontAwesomeIcon icon={faBars} />
           </button>
-          <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby='offcanvasNavbarLabel'>
+          <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar">
             <div className='offcanvas-header'>
-              {/* <h5 className='offcanvas-title' id='offcanvasNavbarLabel'>Close</h5> */}
-              <button type='button' className='btn-close' data-bs-dismiss="offcanvas" aria-label='Close'></button>
+              <button className='btn-close' data-bs-dismiss="offcanvas" />
             </div>
             <div className='offcanvas-body justify-content-end pe-3'>
               <ul className='navbar-nav text-light'>
                 <li className="nav-item px-2"><Link to="/buy" className="nav-link text-light">Buy</Link></li>
                 <li className="nav-item px-2"><Link to="/sell" className="nav-link text-light">Sell</Link></li>
                 <li className="nav-item px-2 dropdown">
-                  <button className='btn text-nowrap nav-link dropdown-toggle text-light' type='button ' data-bs-toggle='dropdown' aria-expanded='false'>
+                  <button className='btn text-nowrap nav-link dropdown-toggle text-light' data-bs-toggle='dropdown'>
                     Utilities
                   </button>
-                  <ul className="dropdown-menu" aria-labelledby="appsDropdown">
-                    <li><Link to="/price_estimator" className="dropdown-item">Price Estimator</Link></li>
-                    <li><Link to="/recommend_location" className="dropdown-item">Location Estimator</Link></li>
-                  </ul>
+                    <ul className="dropdown-menu">
+                      <li><Link to="/price_estimator" className="dropdown-item">Price Estimator</Link></li>
+                      <li><Link to="/recommend_location" className="dropdown-item">Location Estimator</Link></li>
+                    </ul>
                 </li>
                 {!isAuthenticated && 
                 <li className="nav-item px-2"><Link to="/accounts" className="nav-link text-light">Signin</Link></li>
@@ -52,11 +53,11 @@ const Header = () => {
                   <button className='btn text-nowrap nav-link dropdown-toggle text-light' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
                     Accounts
                   </button>
-                  <ul className="dropdown-menu" aria-labelledby="appsDropdown">
-                    <li><Link to="/saved_properties" className="dropdown-item">Saved Properties</Link></li>
-                    <li><Link to="/liked_properties" className="dropdown-item">Liked Properties</Link></li>
-                    <li><Link to="/signout" className="nav-link">Sign Out</Link></li>
-                  </ul>
+                    <ul className="dropdown-menu" aria-labelledby="appsDropdown">
+                      <li><Link to="/saved_properties" className="dropdown-item">Saved Properties</Link></li>
+                      <li><Link to="/liked_properties" className="dropdown-item">Liked Properties</Link></li>
+                      <li><Link to="/signout" className="nav-link">Sign Out</Link></li>
+                    </ul>
                 </li>
                 }
                 <li className="nav-item px-2"><Link to="/about" className="nav-link text-light">About</Link></li>
@@ -111,8 +112,9 @@ const PropertyCard = ({ property }) => {
     currency: 'INR'
   });
   const navigate = useNavigate();
+
   return (
-      <div className='card' style={{width:'356px'}} onClick={() => navigate(`/property_details/${property.id}`)}>
+      <div className='card property-card' style={{width:'356px'}} onClick={() => navigate(`/property_details/${property.id}`)}>
         <div className='card-img-top'>
           <img style={{width:'100%', height:'180px', objectFit:'cover'}} src={property.images.length > 0 && property.images[0].image} alt={`Property ${property.id}`} />
         </div>
@@ -183,10 +185,6 @@ const RecommendedSection = () => {
     const scrollContainer = document.getElementById('property-scroll-div');
     const scrollLeftButton = document.getElementById('scroll-left-button');
     const scrollRightButton = document.getElementById('scroll-right-button');
-
-    console.log(scrollContainer.scrollLeft);
-    console.log(scrollContainer.scrollWidth);
-    console.log(scrollContainer.clientWidth);
   
     const isAtLeftEdge = scrollContainer.scrollLeft < 50;
     const isAtRightEdge = scrollContainer.scrollLeft + 50 > scrollContainer.scrollWidth - scrollContainer.clientWidth;
