@@ -5,14 +5,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from './AuthContext';
 import axios from 'axios';
-import './HomePage.css'; 
+import './HomePage.css';
 
 const Header = () => {
 
   const isAuthenticated = useContext(AuthContext).isAuthenticated;
 
   return (
-    <header className="header px-3 py-0 pt-3">
+    <header className="header home-header px-3 py-0 pt-3">
       <nav className="navbar navbar-expand-md py-0" data-bs-theme='dark'>
         <div className='container-fluid'>
 
@@ -34,19 +34,19 @@ const Header = () => {
             </div>
             <div className='offcanvas-body justify-content-end pe-3'>
               <ul className='navbar-nav text-light'>
-                <li className="nav-item px-2"><Link to="/buy" className="nav-link text-light">Buy</Link></li>
-                <li className="nav-item px-2"><Link to="/sell" className="nav-link text-light">Sell</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/buy" className="nav-link text-light">Buy</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/sell" className="nav-link text-light">Sell</Link></li>
                 <li className="nav-item px-2 dropdown">
                   <button className='btn text-nowrap nav-link dropdown-toggle text-light' data-bs-toggle='dropdown'>
                     Utilities
                   </button>
                     <ul className="dropdown-menu">
-                      <li><Link to="/price_estimator" className="dropdown-item">Price Estimator</Link></li>
-                      <li><Link to="/recommend_location" className="dropdown-item">Location Estimator</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link to="/price_estimator" className="dropdown-item">Price Estimator</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link to="/recommend_location" className="dropdown-item">Location Estimator</Link></li>
                     </ul>
                 </li>
                 {!isAuthenticated && 
-                <li className="nav-item px-2"><Link to="/accounts" className="nav-link text-light">Signin</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/accounts" className="nav-link text-light">Signin</Link></li>
                 }
                 {isAuthenticated && 
                 <li className="nav-item px-2 dropdown">
@@ -54,13 +54,13 @@ const Header = () => {
                     Accounts
                   </button>
                     <ul className="dropdown-menu" aria-labelledby="appsDropdown">
-                      <li><Link to="/saved_properties" className="dropdown-item">Saved Properties</Link></li>
-                      <li><Link to="/liked_properties" className="dropdown-item">Liked Properties</Link></li>
-                      <li><Link to="/signout" className="nav-link">Sign Out</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link to="/saved_properties" className="dropdown-item">Saved Properties</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link to="/liked_properties" className="dropdown-item">Liked Properties</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link to="/signout" className="nav-link">Sign Out</Link></li>
                     </ul>
                 </li>
                 }
-                <li className="nav-item px-2"><Link to="/about" className="nav-link text-light">About</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/about" className="nav-link text-light">About</Link></li>
               </ul>
             </div>
           </div>
@@ -114,19 +114,25 @@ const PropertyCard = ({ property }) => {
   const navigate = useNavigate();
 
   return (
-      <div className='card property-card' style={{width:'356px'}} onClick={() => navigate(`/property_details/${property.id}`)}>
-        <div className='card-img-top'>
+      <div className='card property-card' style={{width:'370px'}}>
+         {/* onClick={() => navigate(`/property_details/${property.id}`)} */}
+        <div className='card-img-top' style={{overflow:'hidden'}}>
           <img style={{width:'100%', height:'180px', objectFit:'cover'}} src={property.images.length > 0 && property.images[0].image} alt={`Property ${property.id}`} />
         </div>
       
         <div className="card-body p-2" style={{height:'130px'}}>
           <h5 className='card-title fw-bold'>{IndianRupeeFormatter.format(property.price)}</h5>
-          <p className='card-text' style={{fontSize:'17px'}}>
-            {property.bedrooms} bds | {property.bathrooms} ba{property.balcony && ' | Balcony'} | {property.area || '--'} sqft | {property.area_type}
-            <br />
-            {property.address}, {property.location}
-            <p style={{fontSize:'14px'}}>Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}</p>
-          </p>
+          <div className='card-text'>
+            <p style={{fontSize:'16px', margin:'0', textOverflow:'ellipsis', overflow:'hidden', textWrap:'nowrap'}}>
+              <b>{property.bedrooms} </b>bds | <b>{property.bathrooms}</b> ba <b>{property.balcony && ' | Balcony'}</b> | <b>{property.area || '--'}</b> sqft | {property.area_type}
+            </p>
+            <p style={{fontSize:'16px', margin:'0', textOverflow:'ellipsis', overflow:'hidden', textWrap:'nowrap'}}>
+              {property.address}, {property.location}
+            </p>
+            <p style={{fontSize:'13px'}}>
+              Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}
+            </p>
+          </div>
         </div>
       </div>
   );
@@ -144,7 +150,7 @@ const RecommendedSection = () => {
           page: 1,
         }
       })
-      setProperties(response.data);
+      setProperties(response.data.results);
       setIsLoading(false);
     }
     catch (error) {

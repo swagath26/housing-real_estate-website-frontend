@@ -1,16 +1,25 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+// import './PropertyCard.css';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faHeart } from '@fortawesome/free-solid-svg-icons';
 
 const PropertyCard = ({ property }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const IndianRupeeFormatter = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR'
   });
 
   return (
-      <div className='card property-card' style={{width:'356px'}} onClick={() => navigate(`/property_details/${property.id}`)}>
-        <div className='card-img-top'>
+      <div className='card property-card' style={{width:'100vh'}}>
+         {/* onClick={() => navigate(`/property_details/${property.id}`)} */}
+        
+        {/* <div id='favourites-icon' style={{position:'absolute', top:'10px', right:'10px', zIndex:'1'}} >
+          <FontAwesomeIcon icon={faHeart} color='white' className='hover-dark' />
+        </div> */}
+
+        <div className='card-img-top' style={{overflow:'hidden'}}>
 
           <div id={`property_${property.id}`} class="carousel slide">
             <div class="carousel-inner">
@@ -40,13 +49,24 @@ const PropertyCard = ({ property }) => {
         </div>
       
         <div className="card-body p-2" style={{height:'130px'}}>
-          <h5 className='card-title fw-bold'>{IndianRupeeFormatter.format(property.price)}</h5>
-          <p className='card-text' style={{fontSize:'16px'}}>
+          <div className='row mb-2'>
+            <div className='col-6'>
+              <h5 className='card-title fw-bold m-0'>{IndianRupeeFormatter.format(property.price)}</h5>
+            </div>
+            <div className='col-6 d-flex justify-content-center'>
+              <button style={{fontSize:'13px'}} className='btn btn-outline-primary py-0'>View <i className='fa-solid fa-location-dot' /></button>
+            </div>
+          </div>
+          <div className='card-text'>
+            <p style={{fontSize:'16px', margin:'0', textOverflow:'ellipsis', overflow:'hidden', textWrap:'nowrap'}}>
             <b>{property.bedrooms} </b>bds | <b>{property.bathrooms}</b> ba <b>{property.balcony && ' | Balcony'}</b> | <b>{property.area || '--'}</b> sqft
-            <br />
+            </p>
+            <p style={{fontSize:'16px', margin:'0', textOverflow:'ellipsis', overflow:'hidden', textWrap:'nowrap'}} >
             {property.address}, {property.location}
-            <p style={{fontSize:'13px'}}>Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}</p>
-          </p>
+            </p>
+            <p style={{fontSize:'13px', margin:'0'}}>Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}
+            </p>
+          </div>
         </div>
       </div>
   );

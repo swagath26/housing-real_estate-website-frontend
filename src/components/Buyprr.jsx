@@ -6,6 +6,8 @@ import './Buy.css';
 
 const Buy = () => {
 
+  const searchInputRef = useRef(null);
+
   const [properties, setProperties] = useState([]);
   const [propertyCount, setPropertyCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,23 +58,65 @@ const Buy = () => {
 
   const [map, setMap] = useState(null);
   const [markers] = useState({});
-  const [center, setCenter] = useState([13.0, 77.5]);
-  const [zoom, setZoom] = useState(12);
+  const [center, setCenter] = useState({ lat: 13, lng: 77.5 });
+  const [zoom, setZoom] = useState(11);
 
   const handleMapFilter = () => {
-    setMinLatFilter(map.getBounds()._southWest.lat);
-    setMaxLatFilter(map.getBounds()._northEast.lat);
-    setMinLngFilter(map.getBounds()._southWest.lng);
-    setMaxLngFilter(map.getBounds()._northEast.lng);
+    setMinLatFilter(map.getBounds().ci.lo);
+    setMaxLatFilter(map.getBounds().ci.hi);
+    setMinLngFilter(map.getBounds().Lh.lo);
+    setMaxLngFilter(map.getBounds().Lh.hi);
   }
 
+  useEffect(() => {
+    async function initMap() {
+      const { Map } = await window.google.maps.importLibrary("maps");
+      const map_obj = new Map(document.getElementById('map'), {
+        center: center,
+        zoom: zoom
+      });
+      map_obj.setOptions({
+        disableDefaultUI: true,
+        zoomControl: false
+      });
+      setMap(map_obj);
+      if(map_obj.getBounds())
+        console.log('prr',map_obj.getBounds(),'prr');
+    }
+    initMap();
+  }, []);
+
+  const [flag, setFlag] = useState(0);
+  const [mapBounds, setMapBounds] = useState(null);
+
+  if(map && flag===0) {
+    if(map.getBounds()) {
+      setMapBounds(map.getBounds());
+      setFlag(1);
+    }
+  }
+  
+  useEffect(() => {
+    if(map) {
+      if(map.getBounds()) {
+        handleMapFilter();
+        const centerThrottledHandler = throttle(handleMapFilter, 1000);
+        map.addListener('center_changed', centerThrottledHandler);
+        const zoomThrottledHandler = debounce(handleMapFilter, 1000);
+        map.addListener('zoom_changed', zoomThrottledHandler);
+      }
+    }
+  }, [mapBounds])
+
   const [refetch, setRefetch] = useState(false);
+  // const [mounted, setMounted] = useState(true);
   const abortController = useRef(null);
 
   const fetchProperties = async () => {
     const controller = new AbortController();
     abortController.current = controller;
     try {
+      console.log("hehe");
       setIsLoading(true);
       const response = await axios.get('/api/properties_list/', {
         params: {
@@ -85,6 +129,7 @@ const Buy = () => {
         },
         signal: controller.signal,
       });
+      console.log("hihi");
       setProperties(response.data.results);
       setPropertyCount(response.data.count);
       setShowCurrentPage(currentPage);
@@ -99,100 +144,46 @@ const Buy = () => {
         setIsLoading(false);
         abortController.current = null;
       }
+      // else if (mounted) {
       else {
+        console.log(error);
         setIsLoading(false);
         abortController.current = null;
         setRefetch(true);
+        console.log("trigger refetch")
       }
     }
   };
 
-  
-  const [isMapToggled, setIsMapToggled] = useState(true);
-  const [isMapOpen, setIsMapOpen] = useState(true);
-
-  useEffect(() => {
-    handleMapToggle();
-  }, [isMapToggled])
-
-  const handleMapToggle = () => {
-
-    map && console.log(map.getBounds());
-
-    if ((document.getElementById('map-collapse') != null) && (document.getElementById('property-section') != null)) {
-
-      const map_collapse = document.getElementById('map-collapse');
-      const property_section = document.getElementById('property-section');
-
-      if (window.matchMedia('(max-width: 992px)').matches) {
-
-        if(isMapToggled) {
-          map_collapse.style.display = 'block';
-          setIsMapOpen(true);
-          property_section.style.display = 'none';
-        }
-        else {
-          map_collapse.style.display = 'none';
-          setIsMapOpen(false);
-          property_section.style.display = 'block';
-        }
-      }
-      else {
-        map_collapse.style.display = 'block';
-        setIsMapOpen(true);
-        property_section.style.display = 'block';
-      }
-    }
-  }
-
-  window.matchMedia('(max-width: 992px)').addEventListener('change', handleMapToggle);
-
-
-  useEffect(() => {
-    async function initMap() {
-      const map_obj = window.L.map('map', {
-        center: center,
-        zoom: zoom
-      });
-      window.L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-        id: 'mapbox/streets-v11',
-        accessToken: 'pk.eyJ1Ijoic3dha2tpZGkiLCJhIjoiY2xzdWpzd3E2MHljYzJqbXVldm85aW1lNyJ9.nT5EpqI_tMmKqmH29p78gA'
-      }).addTo(map_obj);
-      // window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      // }).addTo(map_obj);
-      setMap(map_obj);
-    }
-    initMap();
-  }, []);
-  
-
-  useEffect(() => {
-    if(map) {
-        handleMapFilter();
-        const centerThrottledHandler = throttle(handleMapFilter, 1000);
-        map.addEventListener('move', centerThrottledHandler);
-        const zoomThrottledHandler = debounce(handleMapFilter, 1000);
-        map.addEventListener('zoom', zoomThrottledHandler);
-    }
-  }, [map])
-
-
   useEffect(() => {
     if(!isLoading) {
+      // if(minLatFilter && maxLatFilter && minLngFilter && maxLngFilter)
         fetchProperties();
     }
     else if(abortController.current) {
+      console.log("fetch abort")
       abortController.current.abort();
+      console.log("fetch abort 2")
     }
+    // return () => {
+    //   setMounted(false);
+    //   if(abortController.current) {
+    //     abortController.current.abort();
+    //   }
+    // };
   }, [currentPage, sortBy, minPriceFilter, maxPriceFilter, minLatFilter, maxLatFilter, minLngFilter, maxLngFilter]);
 
-
   useEffect(() => {
+    console.log("fetch refetch change");
     if(refetch) {
+      console.log("refetch trigger")
       setRefetch(false);
       fetchProperties();
     }
   }, [refetch])
+
+
+
 
   const handleNextpage = () => {
     if (currentPage < pageCount) {
@@ -206,34 +197,8 @@ const Buy = () => {
     }
   };
 
-  function geocodeLocation(searchText) {
-    const encodedText = encodeURIComponent(searchText);
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodedText}&format=json`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.length > 0) {
-                const firstResult = data[0];
-                const lat = firstResult.lat;
-                const lng = firstResult.lon;
-                setCenter([lat,lng]);
-                setZoom(12);
-            } else {
-                console.log("No results found for:", searchText);
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching geocode data:", error);
-        });
-  }
-
-  const [searchInput, setSearchInput] = useState('');
-
   const handleSearchChange = () => {
-    var search_input = document.getElementById('search-input').value;
-    setSearchInput(search_input);
-    geocodeLocation(search_input);
+    setSearchQuery(searchInputRef.current.value);
   };
 
   // const handlePriceFilterChange = (event) => {
@@ -243,48 +208,53 @@ const Buy = () => {
   // }
 
   const [filterPrice, setFilterPrice] = useState('Price');
-  const [filterBeds, setFilterBeds] = useState('Beds');
-  const [filterBaths, setFilterBaths] = useState('Baths');
+  const [filterBeds, setFilterBeds] = useState('Beds & Baths');
   const [filterArea, setFilterArea] = useState('Area');
-  const [filterHomeType, setFilterHomeType] = useState('Type');
+  const [filterCount, setFilterCount] = useState(0);
 
   const [selectedPropertyView, setSelectedPropertyView] = useState(null);
   const [prevSelectedPropertyView, setPrevSelectedPropertyView] = useState(null);
 
-  const icon_1 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon2.png",
-  })
+  const icon_1 = {
+    url: "/static/img/map_std_icon2.png",
+  }
 
-  const icon_2 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon3.png",
-  })
+  const icon_2 = {
+    url: "/static/img/map_std_icon3.png",
+  }
 
-  const icon_3 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon5.png",
-  })
+  const icon_3 = {
+    url: "/static/img/map_std_icon5.png",
+  }
 
   useEffect(() => {
-    if (!isLoading && isMapOpen) {
+    if (!isLoading) {
       for(let key in markers)
-        markers[key].remove();
+        markers[key].setMap(null);
       properties.forEach(property => {
-        if (property.latitude && property.longitude) {
-          let new_marker = window.L.marker(
-            [parseFloat(property.latitude), parseFloat(property.longitude)], 
-            {icon: icon_1}
-          ).addTo(map);
-          new_marker.bindPopup(property.price)
+        if (property.latitude) {
+          let new_marker = new window.google.maps.Marker({
+            position: { lat: parseFloat(property.latitude), lng: parseFloat(property.longitude) },
+            map: map,
+            icon: icon_1,
+          });
           markers[property.id] = new_marker;
         }
       });
     }
-  }, [properties, isMapOpen]);
+  }, [properties]);
 
   useEffect(() => {
     if(map) {
-      map.setView(center, zoom);
+      map.setCenter(center);
     }
-  }, [center, zoom]);
+  }, [center]);
+
+  useEffect(() => {
+    if(map) {
+      map.setZoom(zoom);
+    }
+  }, [zoom]);
 
   useEffect(() => {
     if(prevSelectedPropertyView) {
@@ -294,12 +264,45 @@ const Buy = () => {
 
   useEffect(() => {
     if(selectedPropertyView) {
-      const currentPosition = ([parseFloat(selectedPropertyView.latitude), parseFloat(selectedPropertyView.longitude)]);
+      const currentPosition = ({lat: parseFloat(selectedPropertyView.latitude), lng:parseFloat(selectedPropertyView.longitude)});
       setCenter(currentPosition);
-      setZoom(16)
-      markers[selectedPropertyView.id].setIcon(icon_2);
+      setZoom(13);
+      markers[selectedPropertyView.id].setIcon(null);
     }
   }, [selectedPropertyView])
+
+  const [isMapToggled, setIsMapToggled] = useState(false);
+
+  useEffect(() => {
+    handleMapToggle();
+  }, [isMapToggled])
+
+  const handleMapToggle = () => {
+
+    if ((document.getElementById('map-collapse') != null) && (document.getElementById('property-section') != null)) {
+
+      const map_collapse = document.getElementById('map-collapse');
+      const property_section = document.getElementById('property-section');
+
+      if (window.matchMedia('(max-width: 992px)').matches) {
+
+        if(isMapToggled) {
+          map_collapse.style.display = 'block';
+          property_section.style.display = 'none';
+        }
+        else {
+          map_collapse.style.display = 'none';
+          property_section.style.display = 'block';
+        }
+      }
+      else {
+        map_collapse.style.display = 'block';
+        property_section.style.display = 'block';
+      }
+    }
+  }
+
+  window.matchMedia('(max-width: 992px)').addEventListener('change', handleMapToggle);
 
   const PropertyCard = ({ property }) => {
     // const navigate = useNavigate();
@@ -334,8 +337,8 @@ const Buy = () => {
 
           <div className='card-img-top' style={{overflow:'hidden'}}>
   
-            <div id={`property_${property.id}`} className="carousel slide">
-              <div className="carousel-inner">
+            <div id={`property_${property.id}`} class="carousel slide">
+              <div class="carousel-inner">
   
                 {property.images.map((image, index) => (
                 <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index}>
@@ -346,14 +349,14 @@ const Buy = () => {
               </div>
   
               <div>
-                <button className="carousel-control-prev" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="prev">
-                  <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span className="visually-hidden">Previous</span>
+                <button class="carousel-control-prev" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
                 </button>
   
-                <button className="carousel-control-next" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="next">
-                  <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span className="visually-hidden">Next</span>
+                <button class="carousel-control-next" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
                 </button>
               </div>
   
@@ -363,10 +366,10 @@ const Buy = () => {
         
           <div className="card-body p-2" style={{height:'130px'}}>
             <div className='row mb-2'>
-              <div className='col-7'>
+              <div className='col-6'>
                 <h5 className='card-title fw-bold m-0'>{IndianRupeeFormatter.format(property.price)}</h5>
               </div>
-              <div className='col-5 d-flex justify-content-center'>
+              <div className='col-6 d-flex justify-content-center'>
                 <button style={{fontSize:'13px'}} className='btn btn-outline-primary py-0' onClick={handleViewClick}>View <i className='fa-solid fa-location-dot' /></button>
               </div>
             </div>
@@ -377,7 +380,7 @@ const Buy = () => {
               <p style={{fontSize:'16px', margin:'0', textOverflow:'ellipsis', overflow:'hidden', textWrap:'nowrap'}} >
               {property.address}, {property.location}
               </p>
-              <p style={{fontSize:'13px', margin:'0'}}>Listing by: {property.user_first_name} {property.user_last_name}
+              <p style={{fontSize:'13px', margin:'0'}}>Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}
               </p>
             </div>
           </div>
@@ -386,11 +389,13 @@ const Buy = () => {
   };
 
   const SearchBox = () => {
-    
+    const searchInput = document.getElementById('search-input');
+    const autocomplete = new window.google.maps.places.Autocomplete(searchInput);
+    autocomplete.setFields(["place_id", "geometry", "name"]);
     return (
       <div className='input-group'>
-        <input type='text' id="search-input" className='form-control' placeholder='Search by location, address, etc.' aria-label='Search' aria-describedby='search-addon'/>
-        <button onClick={handleSearchChange} className='btn btn-outline-secondary' id='search-addon'>
+        <input type='text' ref={searchInputRef} id="search-input" className='form-control' placeholder='Search by location, address, etc.' aria-label='Search' aria-describedby='search-addon'/>
+        <button onClick={handleSearchChange} className='btn btn-outline-secondary' type='button' id='search-addon'>
           <i className='fas fa-search'></i>
         </button>
       </div>
@@ -416,7 +421,7 @@ const Buy = () => {
     return (
       <div className='card' style={{maxWidth:'320px'}}>
         <div className='card-header'>
-          <h6>Price Range (in Rs)</h6>
+          <h6>Price Range (in Rs) :</h6>
         </div>
         <div className='card-body'>
           <div className='row mb-1'>
@@ -429,13 +434,13 @@ const Buy = () => {
           </div>
           <div className='row mb-3'>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='ms-4 ps-2' placeholder='No Min' id='min-price' style={{maxWidth:'110px'}} />
+              <input className='ms-4 ps-2' placeholder='No Min' style={{maxWidth:'110px'}} />
             </div>
             <div className='col-2 d-flex justify-content-center'>
               <p>-</p>
             </div>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='me-4 ps-2' placeholder='No Max' id='max-price' style={{maxWidth:'110px'}} />
+              <input className='me-4 ps-2' placeholder='No Max'  style={{maxWidth:'110px'}} />
             </div>
           </div>
           <div className='row'>
@@ -452,7 +457,7 @@ const Buy = () => {
     return (
       <div className='card' style={{maxWidth:'320px'}}>
         <div className='card-header'>
-          <h6>Area in Sqft</h6>
+          <h6>Area in Sqft :</h6>
         </div>
         <div className='card-body'>
           <div className='row mb-1'>
@@ -465,13 +470,13 @@ const Buy = () => {
           </div>
           <div className='row mb-3'>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='ms-4 ps-2' placeholder='No Min' id='min-area' style={{maxWidth:'110px'}} />
+              <input className='ms-4 ps-2' placeholder='No Min' style={{maxWidth:'110px'}} />
             </div>
             <div className='col-2 d-flex justify-content-center'>
               <p>-</p>
             </div>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='me-4 ps-2' placeholder='No Max' id='max-area' style={{maxWidth:'110px'}} />
+              <input className='me-4 ps-2' placeholder='No Max'  style={{maxWidth:'110px'}} />
             </div>
           </div>
           <div className='row'>
@@ -488,33 +493,33 @@ const Buy = () => {
     return (
       <div className='card'>
         <div className='card-header'>
-          <h6>Number of Bedrooms</h6>
+          <h6>Number of Bedrooms:</h6>
         </div>
         <div className='card-body'>
           <div className='row mb-1'>
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed1" />
-              <label className="btn btn-outline-primary" htmlFor="bed1">1</label>
+              <input type="checkbox" class="btn-check" id="bed1" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed1">1</label>
+            </div>
+
+            <div className='col'>-
+              <input type="checkbox" class="btn-check" id="bed2" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed2">2</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed2" />
-              <label className="btn btn-outline-primary" htmlFor="bed2">2</label>
+              <input type="checkbox" class="btn-check" id="bed3" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed3">3</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed3" />
-              <label className="btn btn-outline-primary" htmlFor="bed3">3</label>
+              <input type="checkbox" class="btn-check" id="bed4" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed4">4</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed4" />
-              <label className="btn btn-outline-primary" htmlFor="bed4">4</label>
-            </div>
-
-            <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed5" />
-              <label className="btn btn-outline-primary" htmlFor="bed5">5+</label>
+              <input type="checkbox" class="btn-check" id="bed5" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed5">5+</label>
             </div>
           </div>
           
@@ -532,34 +537,39 @@ const Buy = () => {
     return (
       <div className='card'>
         <div className='card-header'>
-          <h6>Number of Bathrooms</h6>
+          <h6>Number of Bedrooms:</h6>
         </div>
         <div className='card-body'>
           <div className='row mb-1'>
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath1" />
-              <label className="btn btn-outline-primary" htmlFor="bath1">1</label>
+              <input type="radio" class="btn-check" id="bed1" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed1">1</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath2" />
-              <label className="btn btn-outline-primary" htmlFor="bath2">2</label>
+              <input type="radio" class="btn-check" id="bed2" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed2">2</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath3" />
-              <label className="btn btn-outline-primary" htmlFor="bath3">3</label>
+              <input type="radio" class="btn-check" id="bed3" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed3">3</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath4" />
-              <label className="btn btn-outline-primary" htmlFor="bath4">4</label>
+              <input type="radio" class="btn-check" id="bed4" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed4">4</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath5" />
-              <label className="btn btn-outline-primary" htmlFor="bath5">5+</label>
+              <input type="radio" class="btn-check" id="bed5" autocomplete="off" />
+              <label class="btn btn-outline-primary" for="bed5">5</label>
             </div>
+          </div>
+
+          <div className='row my-1'>
+            <input type='checkbox' className='btn-check' id='bedmatch' autoComplete='off'/>
+            <label className='btn btn-outline-primary' htmlFor='bedmatch'>Use Exact match</label>
           </div>
           
           <div className='row my-1'>
@@ -572,71 +582,22 @@ const Buy = () => {
     )
   }
 
-  const HomeTypeFilterBox = () => {
-    return (
-        <div className="card" style={{maxWidth:'320px'}}>
-          <div className='card-header'>
-            <h6>Home Type</h6>
-          </div>
-          <div className='card-body'>
-            <div className='row mb-1'>
-              <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="houses" />
-                <label className='form-check-label' htmlFor="houses">Houses</label>
-              </div>
-
-              <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="apartments" />
-                <label htmlFor="apartments">Apartments</label>
-              </div>
-
-              <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="condos" />
-                <label htmlFor="condos">Condos/Co-ops</label>
-              </div>
-
-              <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="multi" />
-                <label htmlFor="multi">Multi-family</label>
-              </div>
-
-              <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="others" />
-                <label htmlFor="others">Others</label>
-              </div>
-            </div>
-                        
-            <div className='row my-1'>
-              <button className='btn btn-primary'>
-                Apply
-              </button>
-            </div>
-          </div>
-      </div>
-    )
-  }
-
 
   return (
     <div className='buy-container row m-0'>
 
       <div className="map-section col-lg-6 col-xl-5 col-xxl-4 px-2">
         <div className='row search-row m-0 d-flex align-items-center'>
-          <div className='col-lg-10 col-8 p-0'>
-          <div className='input-group'>
-            <input type='text' id="search-input" className='form-control' placeholder='Search by location, address, etc.' aria-label='Search' aria-describedby='search-addon'/>
-            <button onClick={handleSearchChange} className='btn btn-outline-secondary' id='search-addon'>
-              <i className='fas fa-search'></i>
-            </button>
-          </div>
+          <div className='col-10 p-0'>
+            <SearchBox/>
           </div>
 
-          <div className='col-2 px-2' id='map-toggle-button'>
-            <button className='btn btn-outline-dark' onClick={() => {setIsMapToggled(!isMapToggled)}}>{isMapToggled ? 'List' : 'Map' }</button>
+          <div className='col-2 p-0' hidden>
+            <button className='btn btn-outline-dark' id='map-toggle-button' onClick={() => {setIsMapToggled(!isMapToggled)}}>{isMapToggled ? 'List' : 'Map' }</button>
           </div>
 
-          <div className='col-2 px-0 ps-2 d-flex justify-content-center'>
-            <button className='btn btn-outline-dark' style={{width:'100%'}} id='filter-toggle-button' data-bs-toggle='collapse' data-bs-target='#filter-collapse'>Filter</button>
+          <div className='col-2 p-0 d-flex justify-content-center'>
+            <button className='btn btn-outline-dark' id='filter-toggle-button' data-bs-toggle='collapse' data-bs-target='#filter-collapse'>Filter</button>
           </div>
         </div>
 
@@ -647,55 +608,39 @@ const Buy = () => {
         </div>
 
       </div>
-      
 
       <div className='property-section col-lg-6 col-xl-7 col-xxl-8 px-2' id='property-section'>
 
         <div className='filter-section collapse' id="filter-collapse">
-          <div className='filter-row d-flex align-items-center'>
-            <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
-                {filterPrice}
-              </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
-                  <PriceFilterBox/>
-                </div>
-            </div>
-            <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
-                {filterBeds}
-              </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
+          <div className='filter-row d-flex align-items-center justify-content-evenly'>
+            <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+              {filterPrice}
+            </button>
+              <div className="dropdown-menu" aria-labelledby="appsDropdown">
+                <div className="dropdown-item"><PriceFilterBox/></div>
+              </div>
+            <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+              {filterBeds}
+            </button>
+              <div className="dropdown-menu" aria-labelledby="appsDropdown">
+                <div className="dropdown-item">
                   <BedsFilterBox/>
-                </div>
-            </div>
-            <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
-                {filterBaths}
-              </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
                   <BathsFilterBox/>
-                </div>
-            </div>
-            <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
-                {filterArea}
-              </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
-                  <AreaFilterBox/>
-                </div>
-            </div>
-            <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
-                {filterHomeType}
-              </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
-                  <HomeTypeFilterBox/>
-                </div>
-            </div>
-            <div className='col-2 d-flex justify-content-center'>
-              <button className='btn text-nowrap' style={{width:'85%'}}>Clear</button>
-            </div>
+                  </div>
+              </div>
+            <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+              {filterArea}
+            </button>
+              <div className="dropdown-menu" aria-labelledby="appsDropdown">
+                <div className="dropdown-item"><AreaFilterBox/></div>
+              </div>
+            <button className='btn btn-outline-dark dropdown-toggle' data-bs-toggle='dropdown' aria-expanded='false'>
+              More {(filterCount > 0) && `(${filterCount})`}
+            </button>
+              <div className="dropdown-menu" aria-labelledby="appsDropdown">
+                <div className="dropdown-item"><b>More</b></div>
+              </div>
+            <button className='btn text-nowrap'>Clear</button>
           </div>
         </div>
 
@@ -733,8 +678,8 @@ const Buy = () => {
             <div className='list-loaded'>
               <div className='row p-0 m-0'>
                 {properties.map((property) => (
-                  <div key={property.id} className='col-12 col-md-6 col-lg-12 col-xl-6 col-xxl-4 d-flex justify-content-center p-1'>
-                    <PropertyCard property={property} />
+                  <div className='col-12 col-md-6 col-lg-12 col-xl-6 col-xxl-4 d-flex justify-content-center p-1'>
+                    <PropertyCard key={property.id} property={property} />
                   </div>
                 ))}
               </div>

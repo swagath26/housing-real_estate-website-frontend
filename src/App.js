@@ -29,7 +29,6 @@ function App() {
     getCsrfToken();
   }, [isAuthenticated]);
 
-
   return (
     <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, username, csrftoken }}>
       <Layout />
