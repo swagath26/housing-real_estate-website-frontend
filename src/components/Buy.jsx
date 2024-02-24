@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import './Buy.css';
 
 const Buy = () => {
 
+  const params = useParams();
   const [properties, setProperties] = useState([]);
   const [propertyCount, setPropertyCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  //------------------------------------------------------------------
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  //------------------------------------------------------------------
   const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,15 +20,21 @@ const Buy = () => {
   const pageSize = 40;
   const [pageCount, setPageCount] = useState(1);
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(params.search_query? params.search_query : '' );
   const [sortBy, setSortBy] = useState('');
-  // const [priceRangeFilter, setPriceRangeFilter] = useState('');
-  const [minPriceFilter, setMinPriceFilter] = useState('0');
-  const [maxPriceFilter, setMaxPriceFilter] = useState('1000');
+
+  const [minPriceFilter, setMinPriceFilter] = useState(null);
+  const [maxPriceFilter, setMaxPriceFilter] = useState(null);
+  const [minAreaFilter, setMinAreaFilter] = useState(null);
+  const [maxAreaFilter, setMaxAreaFilter] = useState(null);
+  const [bedsFilter, setBedsFilter] = useState([]);
+  const [bathsFilter, setBathsFilter] = useState([]);
+  const [minBedsFilter, setMinBedsFilter] = useState(null);
+  const [minBathsFilter, setMinBathsFilter] = useState(null);
+  const [areaTypefilter, setAreaTypeFilter] = useState([]);
 
   const [minLatFilter, setMinLatFilter] = useState();
   const [maxLatFilter, setMaxLatFilter] = useState();
-
   const [minLngFilter, setMinLngFilter] = useState();
   const [maxLngFilter, setMaxLngFilter] = useState();
 
@@ -52,12 +62,19 @@ const Buy = () => {
     };
   }
 
-
-
   const [map, setMap] = useState(null);
   const [markers] = useState({});
+  //------------------------------------------------------------------
+  const [images, setImages] = useState({});
+  //------------------------------------------------------------------
+
   const [center, setCenter] = useState([13.0, 77.5]);
   const [zoom, setZoom] = useState(12);
+
+  useEffect(() => {
+    if (params.search_query)
+      geocodeLocation(params.search_query)
+  }, []);
 
   const handleMapFilter = () => {
     setMinLatFilter(map.getBounds()._southWest.lat);
@@ -74,6 +91,7 @@ const Buy = () => {
     abortController.current = controller;
     try {
       setIsLoading(true);
+      setImagesLoaded(false)
       const response = await axios.get('/api/properties_list/', {
         params: {
           page: currentPage,
@@ -82,6 +100,16 @@ const Buy = () => {
           max_lat: maxLatFilter,
           min_lng: minLngFilter,
           max_lng: maxLngFilter,
+          min_price: minPriceFilter,
+          max_price: maxPriceFilter,
+          min_area: minAreaFilter,
+          max_area: maxAreaFilter,
+          bedrooms: bedsFilter.join(','),
+          bathrooms: bathsFilter.join(','),
+          min_bed: minBedsFilter,
+          min_bath: minBathsFilter,
+          area_type: areaTypefilter.join(',')
+
         },
         signal: controller.signal,
       });
@@ -184,7 +212,7 @@ const Buy = () => {
     else if(abortController.current) {
       abortController.current.abort();
     }
-  }, [currentPage, sortBy, minPriceFilter, maxPriceFilter, minLatFilter, maxLatFilter, minLngFilter, maxLngFilter]);
+  }, [currentPage, sortBy, minLatFilter, maxLatFilter, minLngFilter, maxLngFilter]);
 
 
   useEffect(() => {
@@ -228,12 +256,8 @@ const Buy = () => {
         });
   }
 
-  const [searchInput, setSearchInput] = useState('');
-
   const handleSearchChange = () => {
-    var search_input = document.getElementById('search-input').value;
-    setSearchInput(search_input);
-    geocodeLocation(search_input);
+    geocodeLocation(searchQuery);
   };
 
   // const handlePriceFilterChange = (event) => {
@@ -247,6 +271,23 @@ const Buy = () => {
   const [filterBaths, setFilterBaths] = useState('Baths');
   const [filterArea, setFilterArea] = useState('Area');
   const [filterHomeType, setFilterHomeType] = useState('Type');
+
+  const clearFilters = () => {
+    setMinPriceFilter(null);
+    setMaxPriceFilter(null);
+    setMinAreaFilter(null);
+    setMaxAreaFilter(null);
+    setMinBedsFilter(null);
+    setMinBathsFilter(null);
+    setAreaTypeFilter([]);
+    setBedsFilter([]);
+    setBathsFilter([]);
+    setFilterPrice('Price');
+    setFilterBaths('Baths');
+    setFilterBeds('Beds');
+    setFilterArea('Area');
+    setFilterHomeType('Type');
+  }
 
   const [selectedPropertyView, setSelectedPropertyView] = useState(null);
   const [prevSelectedPropertyView, setPrevSelectedPropertyView] = useState(null);
@@ -264,6 +305,22 @@ const Buy = () => {
   })
 
   useEffect(() => {
+
+    //-------------------------------------------------------------------------------------
+    if (!isLoading) {
+      for(let key in images)
+        delete images[key];
+      properties.forEach(property => {
+          let new_sample = randomSample(3,8);
+          images[property.id] = new_sample;
+      });
+      if ((Object.keys(images).length == properties.length) && properties.length > 0) {
+        setImagesLoaded(true);
+      }
+    }
+    //---------------------------------------------------------------------------------------
+
+
     if (!isLoading && isMapOpen) {
       for(let key in markers)
         markers[key].remove();
@@ -284,7 +341,7 @@ const Buy = () => {
     if(map) {
       map.setView(center, zoom);
     }
-  }, [center, zoom]);
+  }, [center, zoom, map]);
 
   useEffect(() => {
     if(prevSelectedPropertyView) {
@@ -301,7 +358,24 @@ const Buy = () => {
     }
   }, [selectedPropertyView])
 
-  const PropertyCard = ({ property }) => {
+  //------------------------------------------------------------------
+  const randomSample = (minSize, maxSize) => {
+    const array = [];
+    for (let i = 0; i < 16; i++) {
+      array.push(i);
+    }
+    const sample = [];
+    var randomIndex = 0;
+    const len = minSize + Math.random()*(maxSize-minSize);
+    for (let i = 0; i < len; i++) {
+      randomIndex = Math.floor(Math.random() * (16 - i));
+      sample.push(array[randomIndex])
+    }
+    return sample;
+  }
+  //------------------------------------------------------------------
+
+  const PropertyCard = ({ property}) => {
     // const navigate = useNavigate();
     const IndianRupeeFormatter = new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -337,9 +411,14 @@ const Buy = () => {
             <div id={`property_${property.id}`} className="carousel slide">
               <div className="carousel-inner">
   
-                {property.images.map((image, index) => (
+                {
+                // property.images.map((image, index) => (
+                imagesLoaded && images[property.id].map((num, index) => (
                 <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index}>
-                  <img className='w-100 object-fit-cover' style={{height:'160px'}} src={image.image} alt={`Property Image ${index+1}`} />
+                  <img className='w-100 object-fit-cover' style={{height:'160px'}} 
+                  // src={image.image}
+                  src = {`/static/img/property_images/image${num}.jpg`}
+                  alt={`Property Image ${index+1}`} />
                 </div>
                 ))}
   
@@ -385,18 +464,6 @@ const Buy = () => {
     );
   };
 
-  const SearchBox = () => {
-    
-    return (
-      <div className='input-group'>
-        <input type='text' id="search-input" className='form-control' placeholder='Search by location, address, etc.' aria-label='Search' aria-describedby='search-addon'/>
-        <button onClick={handleSearchChange} className='btn btn-outline-secondary' id='search-addon'>
-          <i className='fas fa-search'></i>
-        </button>
-      </div>
-    )
-  };
-
   const SortButton = () => {
     return (
       <div className='dropdown'>
@@ -429,17 +496,17 @@ const Buy = () => {
           </div>
           <div className='row mb-3'>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='ms-4 ps-2' placeholder='No Min' id='min-price' style={{maxWidth:'110px'}} />
+              <input className='ms-4 ps-2' placeholder='No Min' id='min-price' value={minPriceFilter} onChange={(event) => {setMinPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
             </div>
             <div className='col-2 d-flex justify-content-center'>
               <p>-</p>
             </div>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='me-4 ps-2' placeholder='No Max' id='max-price' style={{maxWidth:'110px'}} />
+              <input className='me-4 ps-2' placeholder='No Max' id='max-price' value={maxPriceFilter} onChange={(event) => {setMaxPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
             </div>
           </div>
           <div className='row'>
-            <button className='btn btn-primary'>
+            <button className='btn btn-primary' onClick={() => {fetchProperties()}}>
               Apply
             </button>
           </div>
@@ -465,17 +532,17 @@ const Buy = () => {
           </div>
           <div className='row mb-3'>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='ms-4 ps-2' placeholder='No Min' id='min-area' style={{maxWidth:'110px'}} />
+              <input className='ms-4 ps-2' placeholder='No Min' id='min-area' value={minAreaFilter} onChange={(event) => {setMinAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
             </div>
             <div className='col-2 d-flex justify-content-center'>
               <p>-</p>
             </div>
             <div className='col-5 d-flex justify-content-center'>
-              <input className='me-4 ps-2' placeholder='No Max' id='max-area' style={{maxWidth:'110px'}} />
+              <input className='me-4 ps-2' placeholder='No Max' id='max-area' value={maxAreaFilter} onChange={(event) => {setMaxAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
             </div>
           </div>
           <div className='row'>
-            <button className='btn btn-primary'>
+            <button className='btn btn-primary' onClick={() => {fetchProperties()}}>
               Apply
             </button>
           </div>
@@ -493,33 +560,43 @@ const Buy = () => {
         <div className='card-body'>
           <div className='row mb-1'>
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed1" />
+              <input type="checkbox" className="btn-check" id="bed1" checked={bedsFilter.includes(1)} onChange={(event) => {
+                setBedsFilter(event.target.checked ? [...bedsFilter, 1] : bedsFilter.filter((n) => n != 1));
+              }} />
               <label className="btn btn-outline-primary" htmlFor="bed1">1</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed2" />
+              <input type="checkbox" className="btn-check" id="bed2" checked={bedsFilter.includes(2)} onChange={(event) => {
+                setBedsFilter(event.target.checked ? [...bedsFilter, 2] : bedsFilter.filter((n) => n != 2));
+              }}/>
               <label className="btn btn-outline-primary" htmlFor="bed2">2</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed3" />
+              <input type="checkbox" className="btn-check" id="bed3" checked={bedsFilter.includes(3)} onChange={(event) => {
+                setBedsFilter(event.target.checked ? [...bedsFilter, 3] : bedsFilter.filter((n) => n != 3));
+              }}/>
               <label className="btn btn-outline-primary" htmlFor="bed3">3</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed4" />
+              <input type="checkbox" className="btn-check" id="bed4" checked={bedsFilter.includes(4)} onChange={(event) => {
+                setBedsFilter(event.target.checked ? [...bedsFilter, 4] : bedsFilter.filter((n) => n != 4));
+              }}/>
               <label className="btn btn-outline-primary" htmlFor="bed4">4</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed5" />
+              <input type="checkbox" className="btn-check" id="bed5" checked={minBedsFilter} onChange={(event) => {
+                setMinBedsFilter(event.target.checked ? 5 : null)}}/>
               <label className="btn btn-outline-primary" htmlFor="bed5">5+</label>
             </div>
           </div>
           
           <div className='row my-1'>
-            <button className='btn btn-primary'>
+            <button className='btn btn-primary' onClick={() => {
+              fetchProperties()}}>
               Apply
             </button>
           </div>
@@ -537,33 +614,42 @@ const Buy = () => {
         <div className='card-body'>
           <div className='row mb-1'>
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath1" />
+              <input type="checkbox" className="btn-check" id="bath1" checked={bathsFilter.includes(1)} onChange={(event) => {
+                setBathsFilter(event.target.checked ? [...bathsFilter, 1] : bathsFilter.filter((n) => n != 1));
+              }} />
               <label className="btn btn-outline-primary" htmlFor="bath1">1</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath2" />
+              <input type="checkbox" className="btn-check" id="bath2" checked={bathsFilter.includes(2)} onChange={(event) => {
+                setBathsFilter(event.target.checked ? [...bathsFilter, 2] : bathsFilter.filter((n) => n != 2));
+              }} />
               <label className="btn btn-outline-primary" htmlFor="bath2">2</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath3" />
+              <input type="checkbox" className="btn-check" id="bath3" checked={bathsFilter.includes(3)} onChange={(event) => {
+                setBathsFilter(event.target.checked ? [...bathsFilter, 3] : bathsFilter.filter((n) => n != 3));
+              }} />
               <label className="btn btn-outline-primary" htmlFor="bath3">3</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath4" />
+              <input type="checkbox" className="btn-check" id="bath4" checked={bathsFilter.includes(4)} onChange={(event) => {
+                setBathsFilter(event.target.checked ? [...bathsFilter, 4] : bathsFilter.filter((n) => n != 4));
+              }}/>
               <label className="btn btn-outline-primary" htmlFor="bath4">4</label>
             </div>
 
             <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath5" />
+              <input type="checkbox" className="btn-check" id="bath5" checked={minBathsFilter} onChange={(event) => {
+                setMinBathsFilter(event.target.checked ? 5 : null)}} />
               <label className="btn btn-outline-primary" htmlFor="bath5">5+</label>
             </div>
           </div>
           
           <div className='row my-1'>
-            <button className='btn btn-primary'>
+            <button className='btn btn-primary' onClick={() => {fetchProperties()}}>
               Apply
             </button>
           </div>
@@ -581,33 +667,36 @@ const Buy = () => {
           <div className='card-body'>
             <div className='row mb-1'>
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="houses" />
+                <input type="checkbox" className="form-check-input" id="houses" checked={areaTypefilter.includes('Plot Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Plot Area'] : areaTypefilter.filter((n) => n != 'Plot Area'));
+              }}/>
                 <label className='form-check-label' htmlFor="houses">Houses</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="apartments" />
+                <input type="checkbox" className="form-check-input" id="apartments" checked={areaTypefilter.includes('Built-up Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Built-up Area'] : areaTypefilter.filter((n) => n != 'Built-up Area'));
+              }}/>
                 <label htmlFor="apartments">Apartments</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="condos" />
+                <input type="checkbox" className="form-check-input" id="condos" checked={areaTypefilter.includes('Super Built-up Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Super Built-up Area'] : areaTypefilter.filter((n) => n != 'Super Built-up Area'));
+              }} />
                 <label htmlFor="condos">Condos/Co-ops</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="multi" />
+                <input type="checkbox" className="form-check-input" id="multi"  checked={areaTypefilter.includes('Carpet Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Carpet Area'] : areaTypefilter.filter((n) => n != 'Carpet Area'));
+              }}/>
                 <label htmlFor="multi">Multi-family</label>
-              </div>
-
-              <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="others" />
-                <label htmlFor="others">Others</label>
               </div>
             </div>
                         
             <div className='row my-1'>
-              <button className='btn btn-primary'>
+              <button className='btn btn-primary' onClick={fetchProperties}>
                 Apply
               </button>
             </div>
@@ -616,6 +705,15 @@ const Buy = () => {
     )
   }
 
+  useEffect(() => {
+    document.getElementById('search-input').addEventListener('keypress', (event) => {
+      if(event.key == 'Enter') {
+        event.preventDefault();
+        geocodeLocation(event.target.value);
+      }
+    })
+  }, []);
+
 
   return (
     <div className='buy-container row m-0'>
@@ -623,12 +721,12 @@ const Buy = () => {
       <div className="map-section col-lg-6 col-xl-5 col-xxl-4 px-2">
         <div className='row search-row m-0 d-flex align-items-center'>
           <div className='col-lg-10 col-8 p-0'>
-          <div className='input-group'>
-            <input type='text' id="search-input" className='form-control' placeholder='Search by location, address, etc.' aria-label='Search' aria-describedby='search-addon'/>
-            <button onClick={handleSearchChange} className='btn btn-outline-secondary' id='search-addon'>
-              <i className='fas fa-search'></i>
-            </button>
-          </div>
+            <div className='input-group'>
+              <input type='text' id="search-input" value={searchQuery} onChange={(event) => {setSearchQuery(event.target.value)}} className='form-control' placeholder='Search by location, address, etc.' aria-label='Search' aria-describedby='search-addon'/>
+              <button onClick={handleSearchChange} className='btn btn-outline-secondary' id='search-addon'>
+                <i className='fas fa-search'></i>
+              </button>
+            </div>
           </div>
 
           <div className='col-2 px-2' id='map-toggle-button'>
@@ -658,7 +756,46 @@ const Buy = () => {
                 {filterPrice}
               </button>
                 <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
-                  <PriceFilterBox/>
+                <div className='card' style={{maxWidth:'320px'}}>
+                  <div className='card-header'>
+                    <h6>Price Range (in Rs)</h6>
+                  </div>
+                  <div className='card-body'>
+                    <div className='row mb-1'>
+                      <div className='col-6 d-flex justify-content-center'>
+                        <b>Minimum</b>
+                      </div>
+                      <div className='col-6 d-flex justify-content-center'>
+                        <b>Maximum</b>
+                      </div>
+                    </div>
+                    <div className='row mb-3'>
+                      <div className='col-5 d-flex justify-content-center'>
+                        <input className='ms-4 ps-2' placeholder='No Min' id='min-price' value={minPriceFilter} onChange={(event) => {setMinPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                      </div>
+                      <div className='col-2 d-flex justify-content-center'>
+                        <p>-</p>
+                      </div>
+                      <div className='col-5 d-flex justify-content-center'>
+                        <input className='me-4 ps-2' placeholder='No Max' id='max-price' value={maxPriceFilter} onChange={(event) => {setMaxPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                      </div>
+                    </div>
+                    <div className='row'>
+                      <button className='btn btn-primary' onClick={() => {
+                        setFilterPrice(minPriceFilter && maxPriceFilter ? 
+                          `Rs ${minPriceFilter/100000}L - ${maxPriceFilter/100000}L` : 
+                          (minPriceFilter ?
+                            `Rs ${minPriceFilter/100000}L+` :
+                            (maxPriceFilter ?
+                              `Upto Rs ${maxPriceFilter/100000}L` :
+                              'Price'))
+                        );
+                        fetchProperties()}}>
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 </div>
             </div>
             <div className='col-2 d-flex justify-content-center'>
@@ -682,7 +819,46 @@ const Buy = () => {
                 {filterArea}
               </button>
                 <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
-                  <AreaFilterBox/>
+                  <div className='card' style={{maxWidth:'320px'}}>
+                    <div className='card-header'>
+                      <h6>Area in Sqft</h6>
+                    </div>
+                    <div className='card-body'>
+                      <div className='row mb-1'>
+                        <div className='col-6 d-flex justify-content-center'>
+                          <b>Minimum</b>
+                        </div>
+                        <div className='col-6 d-flex justify-content-center'>
+                          <b>Maximum</b>
+                        </div>
+                      </div>
+                      <div className='row mb-3'>
+                        <div className='col-5 d-flex justify-content-center'>
+                          <input className='ms-4 ps-2' placeholder='No Min' id='min-area' value={minAreaFilter} onChange={(event) => {setMinAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                        </div>
+                        <div className='col-2 d-flex justify-content-center'>
+                          <p>-</p>
+                        </div>
+                        <div className='col-5 d-flex justify-content-center'>
+                          <input className='me-4 ps-2' placeholder='No Max' id='max-area' value={maxAreaFilter} onChange={(event) => {setMaxAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                        </div>
+                      </div>
+                      <div className='row'>
+                        <button className='btn btn-primary' onClick={() => {
+                          setFilterArea(minAreaFilter && maxAreaFilter ? 
+                            `${minAreaFilter} - ${maxAreaFilter} sqft` : 
+                            (minAreaFilter ?
+                              `${minAreaFilter} sqft+` :
+                              (maxAreaFilter ?
+                                `Upto ${maxAreaFilter} sqft` :
+                                'Area'))
+                          );
+                          fetchProperties()}}>
+                          Apply
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
             </div>
             <div className='col-2 d-flex justify-content-center'>
@@ -694,7 +870,9 @@ const Buy = () => {
                 </div>
             </div>
             <div className='col-2 d-flex justify-content-center'>
-              <button className='btn text-nowrap' style={{width:'85%'}}>Clear</button>
+              <button className='btn text-nowrap' onClick={clearFilters} style={{width:'85%'}}>
+                Clear
+              </button>
             </div>
           </div>
         </div>
@@ -734,7 +912,7 @@ const Buy = () => {
               <div className='row p-0 m-0'>
                 {properties.map((property) => (
                   <div key={property.id} className='col-12 col-md-6 col-lg-12 col-xl-6 col-xxl-4 d-flex justify-content-center p-1'>
-                    <PropertyCard property={property} />
+                    <PropertyCard property={property}  />
                   </div>
                 ))}
               </div>

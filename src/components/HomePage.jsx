@@ -71,6 +71,20 @@ const Header = () => {
 }
 
 const TopView = () => {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const handleSearch = () => {
+    navigate(`/buy/${searchQuery}`)
+  };
+  useEffect(() => {
+    document.getElementById('search-input').addEventListener('keypress', (event) => {
+      if(event.key == 'Enter') {
+        event.preventDefault();
+        navigate(`/buy/${event.target.value}`);
+      }
+    })
+  }, []);
+  
   return (
       <div className="view" style={{ backgroundImage: "url(/static/img/housing-bg5.jpg)", backgroundSize:'cover', backgroundRepeat:'no-repeat',  backgroundPosition: 'top'}}>
         <Header />
@@ -91,8 +105,8 @@ const TopView = () => {
                   <div className='col-sm-1 col-lg-2 col-xl-3'></div>
                   <div className='col-sm-10 col-lg-8 col-xl-6'>
                     <div className='input-group'>
-                      <input type='text' id='search' className='form-control' placeholder='Search by location, society, etc.' aria-label='Search' aria-describedby='search-addon'/>
-                      <button className='btn btn-outline-light' type='button' id='search-addon'>
+                      <input type='text' id="search-input" value={searchQuery} onChange={(event) => {setSearchQuery(event.target.value)}} className='form-control' placeholder='Search by location, address, etc.' aria-label='Search' aria-describedby='search-addon'/>
+                      <button onClick={handleSearch} className='btn btn-outline-light' id='search-addon'>
                         <i className='fas fa-search'></i>
                       </button>
                     </div>
