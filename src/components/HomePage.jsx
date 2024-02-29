@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-// import Slider from 'react-slick';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
@@ -95,8 +94,8 @@ const TopView = () => {
             <p className="fs-6 fw-light">Find your dream home with us</p>< br />< br />
           </section>
 
-          <div class="container-fluid">
-              <div class="row text-light">
+          <div className="container-fluid">
+              <div className="row text-light">
                 <div>
                   <br /><br />
                   <br /><br /><br /><br /><br /><br /><br /><br />
@@ -131,7 +130,7 @@ const PropertyCard = ({ property }) => {
       <div className='card property-card' style={{width:'370px'}}>
          {/* onClick={() => navigate(`/property_details/${property.id}`)} */}
         <div className='card-img-top' style={{overflow:'hidden'}}>
-          <img style={{width:'100%', height:'180px', objectFit:'cover'}} src={property.images.length > 0 && property.images[0].image} alt={`Property ${property.id}`} />
+          <img style={{width:'100%', height:'180px', objectFit:'cover'}} src={property.images && property.images.length > 0 && property.images[0].image} alt={`Property ${property.id}`} />
         </div>
       
         <div className="card-body p-2" style={{height:'130px'}}>
@@ -162,6 +161,7 @@ const RecommendedSection = () => {
       const response = await axios.get('/api/properties_list/', {
         params: {
           page: 1,
+          page_size: 10
         }
       })
       setProperties(response.data.results);
@@ -216,7 +216,7 @@ const RecommendedSection = () => {
   }
 
   return (
-      <div class="container py-5 px-0">
+      <div className="container pb-5 pt-3 px-0">
         <div className='row px-3 mx-0'>
           <div className='col-10 col-xl-11 px-0'>
             <h1 className='fs-3'>Homes For You</h1>
@@ -252,34 +252,87 @@ const Homepage = () => {
   return (
     <div>
       <TopView />
-      <RecommendedSection />
+      
+      
+      <div className='container p-5 mt-2'>
+        <div className='row'>
 
-        <section className="container main-content">
-          <h2 className="mb-4">Explore Apps</h2>
-          <div className="row">
-            <div className="col-md-6">
-              <Link to="/price_estimator" className="btn btn-primary app-box btn-block">House Price Estimator</Link> {/* Use buttons for app links */}
-            </div>
-            <div className="col-md-6">
-              <Link to="/recommend_location" className="btn btn-primary app-box btn-block">Location Recommendation</Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="container featured-houses">
-          <h2 className="mb-4">Featured Houses</h2>
-          <div className="row">
-            <div className="col-md-6">
-              <div className="card mb-4">
-                <img className="card-img-top" src="/img/house1.jpeg" alt="House 1" />
-                <div className="card-body">
-                  <h4 className="card-title">Beautiful Family Home</h4>
-                  <p className="card-text">3 bedrooms | 2 bathrooms | $300,000</p>
+          <div className='col-lg-4 p-3'>
+            <div className='card nav-card' id='buy-card'>
+              <div className='row p-2 m-0 d-flex justify-content-center'>
+                <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
+                  <img src="/static/img/buy.jpg" style={{width:'100%', maxWidth:'350px'}}/>
+                </div>
+                <div className='col-lg-12 col-12 col-md-6 p-2'>
+                  <div className='row p-2 m-0'>
+                    <h3 className='d-flex justify-content-center' style={{fontFamily:'serif'}}>Buy a home</h3>
+                  </div>
+                  <div className='row p-0 py-2 m-0 d-flex align-items-center' style={{height:'120px'}}>
+                    <p style={{textAlign:'center', fontSize:'17px'}}>Find your place with an immersive photo experience and the listings, 
+                      which you won’t find anywhere else.</p>
+                  </div>
+                  <div className='row p-4 m-0 d-flex justify-content-center'>
+                    <button className='btn btn-outline-primary fw-bold' id='buy-button' style={{maxWidth:'200px'}}>
+                      Browse Homes
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </section>
+
+          <div className='col-lg-4 p-3'>
+            <div className='card nav-card' id='sell-card'>
+              <div className='row p-2 m-0 d-flex justify-content-center'>
+                <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
+                  <img src="/static/img/sell.jpg" style={{width:'100%', maxWidth:'350px'}}/>
+                </div>
+                <div className='col-lg-12 col-12 col-md-6 p-2'>
+                  <div className='row p-2 m-0'>
+                    <h3 className='d-flex justify-content-center' style={{fontFamily:'serif'}}>Sell a home</h3>
+                  </div>
+                  <div className='row p-0 py-2 m-0 d-flex align-items-center' style={{height:'120px'}}>
+                    <p style={{textAlign:'center', fontSize:'17px'}}>No matter what path you take to sell your home, we can help you navigate a 
+                      successful sale without difficulties.</p>
+                  </div>
+                  <div className='row p-4 m-0 d-flex justify-content-center'>
+                    <button className='btn btn-outline-primary fw-bold' id='sell-button' style={{maxWidth:'200px'}}>
+                      See Options
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className='col-lg-4 p-3'>
+            <div className='card nav-card' id='rent-card'>
+              <div className='row p-2 m-0 d-flex justify-content-center'>
+                <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
+                  <img src="/static/img/rent.jpg" style={{width:'100%', maxWidth:'350px'}}/>
+                </div>
+                <div className='col-lg-12 col-12 col-md-6 p-2'>
+                  <div className='row p-2 m-0'>
+                    <h3 className='d-flex justify-content-center' style={{fontFamily:'serif'}}>Rent a home</h3>
+                  </div>
+                  <div className='row p-0 py-2 m-0 d-flex align-items-center' style={{height:'120px'}}>
+                    <p style={{textAlign:'center', fontSize:'17px'}}>Get a seamless online experience from shopping on the largest 
+                      rental network, to applying, to paying rent.</p>
+                  </div>
+                  <div className='row p-4 m-0 d-flex justify-content-center'>
+                    <button className='btn btn-outline-primary fw-bold' id='rent-button' style={{maxWidth:'200px'}}>
+                      Find Rentals
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <RecommendedSection />
 
     </div>
   );

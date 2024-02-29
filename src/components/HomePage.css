@@ -35,3 +35,23 @@
 /* .card:active {
     transform: scale(0.98);
 } */
+.nav-card{
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition-duration: 400ms;
+}
+.nav-card:hover{
+    transform: scale(1.1);
+}
+#buy-card:hover #buy-button{
+    background-color: #0d6efd;
+    color: white;
+}
+#sell-card:hover #sell-button{
+    background-color: #0d6efd;
+    color: white;
+}
+#rent-card:hover #rent-button{
+    background-color: #0d6efd;
+    color: white;
+}

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {Link, useParams} from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import './Buy.css';
 
 const Buy = () => {
@@ -10,9 +12,6 @@ const Buy = () => {
   const [properties, setProperties] = useState([]);
   const [propertyCount, setPropertyCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  //------------------------------------------------------------------
-  const [imagesLoaded, setImagesLoaded] = useState(false);
-  //------------------------------------------------------------------
   const [error, setError] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,14 +22,13 @@ const Buy = () => {
   const [searchQuery, setSearchQuery] = useState(params.search_query? params.search_query : '' );
   const [sortBy, setSortBy] = useState('');
 
-  const [minPriceFilter, setMinPriceFilter] = useState(null);
-  const [maxPriceFilter, setMaxPriceFilter] = useState(null);
-  const [minAreaFilter, setMinAreaFilter] = useState(null);
-  const [maxAreaFilter, setMaxAreaFilter] = useState(null);
+  const [minPriceFilter, setMinPriceFilter] = useState('');
+  const [maxPriceFilter, setMaxPriceFilter] = useState('');
+  const [minAreaFilter, setMinAreaFilter] = useState('');
+  const [maxAreaFilter, setMaxAreaFilter] = useState('');
   const [bedsFilter, setBedsFilter] = useState([]);
-  const [bathsFilter, setBathsFilter] = useState([]);
-  const [minBedsFilter, setMinBedsFilter] = useState(null);
-  const [minBathsFilter, setMinBathsFilter] = useState(null);
+  const [minBedsFilter, setMinBedsFilter] = useState('');
+  const [minBathsFilter, setMinBathsFilter] = useState('');
   const [areaTypefilter, setAreaTypeFilter] = useState([]);
 
   const [minLatFilter, setMinLatFilter] = useState();
@@ -38,12 +36,40 @@ const Buy = () => {
   const [minLngFilter, setMinLngFilter] = useState();
   const [maxLngFilter, setMaxLngFilter] = useState();
 
-  useEffect (() => {
-    const list_section = document.getElementById("list-section");
-    isLoading ? list_section.style.opacity = 0.5 : list_section.style.opacity = 1;
-  }, [isLoading]);
+  const [map, setMap] = useState(null);
+  const [markers] = useState({});
 
-  function throttle(fn, interval) {
+  const [center, setCenter] = useState([13.0, 77.5]);
+  const [zoom, setZoom] = useState(12);
+
+  const [refetch, setRefetch] = useState(false);
+  const abortController = useRef(null);
+
+  const [isMapToggled, setIsMapToggled] = useState(true);
+  const [isMapOpen, setIsMapOpen] = useState(true);
+
+  const [filterPrice, setFilterPrice] = useState('Price');
+  const [filterBeds, setFilterBeds] = useState('Beds');
+  const [filterBaths, setFilterBaths] = useState('Baths');
+  const [filterArea, setFilterArea] = useState('Area');
+  const [filterHomeType, setFilterHomeType] = useState('Type');
+
+  const [selectedPropertyView, setSelectedPropertyView] = useState(null);
+  const [prevSelectedPropertyView, setPrevSelectedPropertyView] = useState(null);
+
+  const icon_1 = window.L.icon({
+    iconUrl: "/static/img/map_std_icon2.png",
+  })
+
+  const icon_2 = window.L.icon({
+    iconUrl: "/static/img/map_std_icon3.png",
+  })
+
+  const icon_3 = window.L.icon({
+    iconUrl: "/static/img/map_std_icon5.png",
+  })
+
+  const throttle = (fn, interval) => {
     let lastCall = 0;
     return (...args) => {
       const now = Date.now();
@@ -54,27 +80,13 @@ const Buy = () => {
     };
   }
   
-  function debounce(fn, interval) {
+  const debounce = (fn, interval) => {
     let timeout;
     return (...args) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => fn(...args), interval);
     };
   }
-
-  const [map, setMap] = useState(null);
-  const [markers] = useState({});
-  //------------------------------------------------------------------
-  const [images, setImages] = useState({});
-  //------------------------------------------------------------------
-
-  const [center, setCenter] = useState([13.0, 77.5]);
-  const [zoom, setZoom] = useState(12);
-
-  useEffect(() => {
-    if (params.search_query)
-      geocodeLocation(params.search_query)
-  }, []);
 
   const handleMapFilter = () => {
     setMinLatFilter(map.getBounds()._southWest.lat);
@@ -83,15 +95,11 @@ const Buy = () => {
     setMaxLngFilter(map.getBounds()._northEast.lng);
   }
 
-  const [refetch, setRefetch] = useState(false);
-  const abortController = useRef(null);
-
   const fetchProperties = async () => {
     const controller = new AbortController();
     abortController.current = controller;
     try {
       setIsLoading(true);
-      setImagesLoaded(false)
       const response = await axios.get('/api/properties_list/', {
         params: {
           page: currentPage,
@@ -104,11 +112,10 @@ const Buy = () => {
           max_price: maxPriceFilter,
           min_area: minAreaFilter,
           max_area: maxAreaFilter,
-          bedrooms: bedsFilter.join(','),
-          bathrooms: bathsFilter.join(','),
+          beds: bedsFilter.join(','),
           min_bed: minBedsFilter,
           min_bath: minBathsFilter,
-          area_type: areaTypefilter.join(',')
+          type: areaTypefilter.join(',')
 
         },
         signal: controller.signal,
@@ -134,14 +141,6 @@ const Buy = () => {
       }
     }
   };
-
-  
-  const [isMapToggled, setIsMapToggled] = useState(true);
-  const [isMapOpen, setIsMapOpen] = useState(true);
-
-  useEffect(() => {
-    handleMapToggle();
-  }, [isMapToggled])
 
   const handleMapToggle = () => {
 
@@ -173,8 +172,76 @@ const Buy = () => {
     }
   }
 
+  const handleNextpage = () => {
+    if (currentPage < pageCount) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const geocodeLocation = (searchText) => {
+    const encodedText = encodeURIComponent(searchText);
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodedText}&format=json`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                const firstResult = data[0];
+                const lat = firstResult.lat;
+                const lng = firstResult.lon;
+                setCenter([lat,lng]);
+                setZoom(12);
+            } else {
+                console.log("No results found for:", searchText);
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching geocode data:", error);
+        });
+  }
+
+  const handleSearchChange = () => {
+    geocodeLocation(searchQuery);
+  };
+
+  const clearFilters = () => {
+    setMinPriceFilter('');
+    setMaxPriceFilter('');
+    setMinAreaFilter('');
+    setMaxAreaFilter('');
+    setMinBedsFilter('');
+    setMinBathsFilter('');
+    setAreaTypeFilter([]);
+    setBedsFilter([]);
+    setFilterPrice('Price');
+    setFilterBaths('Baths');
+    setFilterBeds('Beds');
+    setFilterArea('Area');
+    setFilterHomeType('Type');
+    fetchProperties();
+  }
+
   window.matchMedia('(max-width: 992px)').addEventListener('change', handleMapToggle);
 
+  useEffect(() => {
+    handleMapToggle();
+  }, [isMapToggled])
+
+  useEffect (() => {
+    const list_section = document.getElementById("list-section");
+    isLoading ? list_section.style.opacity = 0.5 : list_section.style.opacity = 1;
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (params.search_query)
+      geocodeLocation(params.search_query)
+  }, []);
 
   useEffect(() => {
     async function initMap() {
@@ -222,105 +289,7 @@ const Buy = () => {
     }
   }, [refetch])
 
-  const handleNextpage = () => {
-    if (currentPage < pageCount) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  function geocodeLocation(searchText) {
-    const encodedText = encodeURIComponent(searchText);
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodedText}&format=json`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.length > 0) {
-                const firstResult = data[0];
-                const lat = firstResult.lat;
-                const lng = firstResult.lon;
-                setCenter([lat,lng]);
-                setZoom(12);
-            } else {
-                console.log("No results found for:", searchText);
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching geocode data:", error);
-        });
-  }
-
-  const handleSearchChange = () => {
-    geocodeLocation(searchQuery);
-  };
-
-  // const handlePriceFilterChange = (event) => {
-  //   const [min, max] = event.target.value;
-  //   setMinPriceFilter(min);
-  //   setMaxPriceFilter(max);
-  // }
-
-  const [filterPrice, setFilterPrice] = useState('Price');
-  const [filterBeds, setFilterBeds] = useState('Beds');
-  const [filterBaths, setFilterBaths] = useState('Baths');
-  const [filterArea, setFilterArea] = useState('Area');
-  const [filterHomeType, setFilterHomeType] = useState('Type');
-
-  const clearFilters = () => {
-    setMinPriceFilter(null);
-    setMaxPriceFilter(null);
-    setMinAreaFilter(null);
-    setMaxAreaFilter(null);
-    setMinBedsFilter(null);
-    setMinBathsFilter(null);
-    setAreaTypeFilter([]);
-    setBedsFilter([]);
-    setBathsFilter([]);
-    setFilterPrice('Price');
-    setFilterBaths('Baths');
-    setFilterBeds('Beds');
-    setFilterArea('Area');
-    setFilterHomeType('Type');
-  }
-
-  const [selectedPropertyView, setSelectedPropertyView] = useState(null);
-  const [prevSelectedPropertyView, setPrevSelectedPropertyView] = useState(null);
-
-  const icon_1 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon2.png",
-  })
-
-  const icon_2 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon3.png",
-  })
-
-  const icon_3 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon5.png",
-  })
-
   useEffect(() => {
-
-    //-------------------------------------------------------------------------------------
-    if (!isLoading) {
-      for(let key in images)
-        delete images[key];
-      properties.forEach(property => {
-          let new_sample = randomSample(3,8);
-          images[property.id] = new_sample;
-      });
-      if ((Object.keys(images).length == properties.length) && properties.length > 0) {
-        setImagesLoaded(true);
-      }
-    }
-    //---------------------------------------------------------------------------------------
-
-
     if (!isLoading && isMapOpen) {
       for(let key in markers)
         markers[key].remove();
@@ -358,22 +327,15 @@ const Buy = () => {
     }
   }, [selectedPropertyView])
 
-  //------------------------------------------------------------------
-  const randomSample = (minSize, maxSize) => {
-    const array = [];
-    for (let i = 0; i < 16; i++) {
-      array.push(i);
-    }
-    const sample = [];
-    var randomIndex = 0;
-    const len = minSize + Math.random()*(maxSize-minSize);
-    for (let i = 0; i < len; i++) {
-      randomIndex = Math.floor(Math.random() * (16 - i));
-      sample.push(array[randomIndex])
-    }
-    return sample;
-  }
-  //------------------------------------------------------------------
+  useEffect(() => {
+    document.getElementById('search-input').addEventListener('keypress', (event) => {
+      if(event.key == 'Enter') {
+        event.preventDefault();
+        geocodeLocation(event.target.value);
+      }
+    })
+  }, []);
+
 
   const PropertyCard = ({ property}) => {
     // const navigate = useNavigate();
@@ -401,23 +363,30 @@ const Buy = () => {
           }
           // onClick={() => navigate(`/property_details/${property.id}`)}
         >
-          
-          {/* <div id='favourites-icon' style={{position:'absolute', top:'10px', right:'10px', zIndex:'1'}} >
-            <FontAwesomeIcon icon={faHeart} color='white' className='hover-dark' />
-          </div> */}
 
-          <div className='card-img-top' style={{overflow:'hidden'}}>
+          <div className='card-top-section'>
+
+            <div className="row m-0 p-0 pt-1" style={{position:'absolute', zIndex:'1', width:'100%'}}>
+              <div className='col-10 px-1'>
+                <div className='rounded-3 px-2' style={{backgroundColor:'rgba(0,0,0,0.7)', color:'#f0f0f0', fontSize:'13px', display:'inline-block'}}>
+                  {property.area_type}
+                </div>
+              </div>
+              <div className='col-2' >
+                <a className='favourites-icon' id={`fav_${property.id}`} style={{display:'inline-block'}}>
+                  <img src="/static/img/fav-logo.png"/>
+                </a>
+              </div>
+            </div>
   
-            <div id={`property_${property.id}`} className="carousel slide">
+            <div id={`property_${property.id}`} className="carousel slide" style={{zIndex:'0'}}>
               <div className="carousel-inner">
   
-                {
-                // property.images.map((image, index) => (
-                imagesLoaded && images[property.id].map((num, index) => (
+                {property.images && 
+                property.images.map((image, index) => (
                 <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index}>
-                  <img className='w-100 object-fit-cover' style={{height:'160px'}} 
-                  // src={image.image}
-                  src = {`/static/img/property_images/image${num}.jpg`}
+                  <img className='w-100 object-fit-cover card-img' style={{height:'160px', overflow:'hidden'}} 
+                  src={image.image}
                   alt={`Property Image ${index+1}`} />
                 </div>
                 ))}
@@ -425,14 +394,12 @@ const Buy = () => {
               </div>
   
               <div>
-                <button className="carousel-control-prev" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="prev">
-                  <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span className="visually-hidden">Previous</span>
+                <button className="carousel-controls carousel-control-prev" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="prev">
+                  <FontAwesomeIcon icon={faAngleLeft} style={{fontSize:'30px'}} />
                 </button>
   
-                <button className="carousel-control-next" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="next">
-                  <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span className="visually-hidden">Next</span>
+                <button className="carousel-controls carousel-control-next" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="next">
+                  <FontAwesomeIcon icon={faAngleRight} style={{fontSize:'30px'}} />
                 </button>
               </div>
   
@@ -468,134 +435,114 @@ const Buy = () => {
     return (
       <div className='dropdown'>
         <button className='btn text-nowrap dropdown-toggle' type='button' id='sortDropdown' data-bs-toggle='dropdown' aria-expanded='false'>
-          Sort By {(sortBy != '') && `(${sortBy})`}
+          Sort: {
+          (sortBy == '' && 'Default') ||
+          (sortBy == 'price' && 'Price (Low to High)') ||
+          (sortBy == '-price' && 'Price (High to Low)')
+          }
         </button>
         <ul className='dropdown-menu' aria-labelledby='sortDropdown'>
-          <li><button className='dropdown-item' onClick={() => setSortBy('')}>None</button></li>
-          <li><button className='dropdown-item' onClick={() => setSortBy('price')}>Price (low to High)</button></li>
+          <li><button className='dropdown-item' onClick={() => setSortBy('')}>Default</button></li>
+          <li><button className='dropdown-item' onClick={() => setSortBy('price')}>Price (Low to High)</button></li>
           <li><button className='dropdown-item' onClick={() => setSortBy('-price')}>Price (High to Low)</button></li>
         </ul>
       </div>
     )
   }
 
-  const PriceFilterBox = () => {
-    return (
-      <div className='card' style={{maxWidth:'320px'}}>
-        <div className='card-header'>
-          <h6>Price Range (in Rs)</h6>
-        </div>
-        <div className='card-body'>
-          <div className='row mb-1'>
-            <div className='col-6 d-flex justify-content-center'>
-              <b>Minimum</b>
-            </div>
-            <div className='col-6 d-flex justify-content-center'>
-              <b>Maximum</b>
-            </div>
-          </div>
-          <div className='row mb-3'>
-            <div className='col-5 d-flex justify-content-center'>
-              <input className='ms-4 ps-2' placeholder='No Min' id='min-price' value={minPriceFilter} onChange={(event) => {setMinPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
-            </div>
-            <div className='col-2 d-flex justify-content-center'>
-              <p>-</p>
-            </div>
-            <div className='col-5 d-flex justify-content-center'>
-              <input className='me-4 ps-2' placeholder='No Max' id='max-price' value={maxPriceFilter} onChange={(event) => {setMaxPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
-            </div>
-          </div>
-          <div className='row'>
-            <button className='btn btn-primary' onClick={() => {fetchProperties()}}>
-              Apply
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const [isExactMatchBeds, setIsExactMatchBeds] = useState(false);
+  useEffect(() => {
+    isExactMatchBeds ? setMinBedsFilter('') : setBedsFilter([]);
+  }, [isExactMatchBeds])
   
-  const AreaFilterBox = () => {
-    return (
-      <div className='card' style={{maxWidth:'320px'}}>
-        <div className='card-header'>
-          <h6>Area in Sqft</h6>
-        </div>
-        <div className='card-body'>
-          <div className='row mb-1'>
-            <div className='col-6 d-flex justify-content-center'>
-              <b>Minimum</b>
-            </div>
-            <div className='col-6 d-flex justify-content-center'>
-              <b>Maximum</b>
-            </div>
-          </div>
-          <div className='row mb-3'>
-            <div className='col-5 d-flex justify-content-center'>
-              <input className='ms-4 ps-2' placeholder='No Min' id='min-area' value={minAreaFilter} onChange={(event) => {setMinAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
-            </div>
-            <div className='col-2 d-flex justify-content-center'>
-              <p>-</p>
-            </div>
-            <div className='col-5 d-flex justify-content-center'>
-              <input className='me-4 ps-2' placeholder='No Max' id='max-area' value={maxAreaFilter} onChange={(event) => {setMaxAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
-            </div>
-          </div>
-          <div className='row'>
-            <button className='btn btn-primary' onClick={() => {fetchProperties()}}>
-              Apply
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   const BedsFilterBox = () => {
+    
     return (
       <div className='card'>
         <div className='card-header'>
           <h6>Number of Bedrooms</h6>
         </div>
         <div className='card-body'>
-          <div className='row mb-1'>
-            <div className='col'>
+          <div className='row mb-1 m-0' hidden={!isExactMatchBeds}>
+            <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed1" checked={bedsFilter.includes(1)} onChange={(event) => {
                 setBedsFilter(event.target.checked ? [...bedsFilter, 1] : bedsFilter.filter((n) => n != 1));
               }} />
-              <label className="btn btn-outline-primary" htmlFor="bed1">1</label>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed1">1</label>
             </div>
 
-            <div className='col'>
+            <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed2" checked={bedsFilter.includes(2)} onChange={(event) => {
                 setBedsFilter(event.target.checked ? [...bedsFilter, 2] : bedsFilter.filter((n) => n != 2));
               }}/>
-              <label className="btn btn-outline-primary" htmlFor="bed2">2</label>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed2">2</label>
             </div>
 
-            <div className='col'>
+            <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed3" checked={bedsFilter.includes(3)} onChange={(event) => {
                 setBedsFilter(event.target.checked ? [...bedsFilter, 3] : bedsFilter.filter((n) => n != 3));
               }}/>
-              <label className="btn btn-outline-primary" htmlFor="bed3">3</label>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed3">3</label>
             </div>
 
-            <div className='col'>
+            <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed4" checked={bedsFilter.includes(4)} onChange={(event) => {
                 setBedsFilter(event.target.checked ? [...bedsFilter, 4] : bedsFilter.filter((n) => n != 4));
               }}/>
-              <label className="btn btn-outline-primary" htmlFor="bed4">4</label>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed4">4</label>
             </div>
 
-            <div className='col'>
-              <input type="checkbox" className="btn-check" id="bed5" checked={minBedsFilter} onChange={(event) => {
+            <div className='col px-2'>
+              <input type="checkbox" className="btn-check" id="bed5" checked={bedsFilter.includes(5)} onChange={(event) => {
+                setBedsFilter(event.target.checked ? [...bedsFilter, 5] : bedsFilter.filter((n) => n != 5));
+              }}/>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed5">5</label>
+            </div>
+          </div>
+
+          <div className='row mb-1 m-0' hidden={isExactMatchBeds}>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" name='bedrooms' id="bed1+" checked={minBedsFilter==1} onChange={(event) => {
+                setMinBedsFilter(event.target.checked ? 1 : null)}}/>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed1+">1+</label>
+            </div>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" name='bedrooms' id="bed2+" checked={minBedsFilter==2} onChange={(event) => {
+                setMinBedsFilter(event.target.checked ? 2 : null)}}/>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed2+">2+</label>
+            </div>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" name='bedrooms' id="bed3+" checked={minBedsFilter==3} onChange={(event) => {
+                setMinBedsFilter(event.target.checked ? 3 : null)}}/>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed3+">3+</label>
+            </div>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" name='bedrooms' id="bed4+" checked={minBedsFilter==4} onChange={(event) => {
+                setMinBedsFilter(event.target.checked ? 4 : null)}}/>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed4+">4+</label>
+            </div>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" name='bedrooms' id="bed5+" checked={minBedsFilter==5} onChange={(event) => {
                 setMinBedsFilter(event.target.checked ? 5 : null)}}/>
-              <label className="btn btn-outline-primary" htmlFor="bed5">5+</label>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed5+">5+</label>
+            </div>
+          </div>
+
+          <div className='row my-2 m-0 ps-2'>
+            <div className='form-check'>
+              <input className='form-check-input' type='checkbox' id='useexactmatch' checked={isExactMatchBeds} onChange={() => {setIsExactMatchBeds(!isExactMatchBeds)}}/>
+              <label className='form-check-label' htmlFor='useexactmatch'>Use Exact Match</label>
             </div>
           </div>
           
-          <div className='row my-1'>
+          <div className='row my-1 m-0'>
             <button className='btn btn-primary' onClick={() => {
+              if(minBedsFilter != '')
+                setFilterBeds(`${minBedsFilter}+ bds`)
+              else if(bedsFilter.length > 0)
+                setFilterBeds(`${bedsFilter.sort().join(', ')} bds`)
+              else
+                setFilterBeds('Beds')
               fetchProperties()}}>
               Apply
             </button>
@@ -612,44 +559,45 @@ const Buy = () => {
           <h6>Number of Bathrooms</h6>
         </div>
         <div className='card-body'>
-          <div className='row mb-1'>
-            <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath1" checked={bathsFilter.includes(1)} onChange={(event) => {
-                setBathsFilter(event.target.checked ? [...bathsFilter, 1] : bathsFilter.filter((n) => n != 1));
-              }} />
-              <label className="btn btn-outline-primary" htmlFor="bath1">1</label>
+          <div className='row mb-1 m-0'>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" id="bath1+" name='bathroms' checked={minBathsFilter==1} onChange={(event) => {
+                setMinBathsFilter(event.target.checked ? 1 : null)}} />
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath1+">1+</label>
             </div>
 
-            <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath2" checked={bathsFilter.includes(2)} onChange={(event) => {
-                setBathsFilter(event.target.checked ? [...bathsFilter, 2] : bathsFilter.filter((n) => n != 2));
-              }} />
-              <label className="btn btn-outline-primary" htmlFor="bath2">2</label>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" id="bath2+" name='bathroms' checked={minBathsFilter==2} onChange={(event) => {
+                setMinBathsFilter(event.target.checked ? 2 : null)}} />
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath2+">2+</label>
             </div>
 
-            <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath3" checked={bathsFilter.includes(3)} onChange={(event) => {
-                setBathsFilter(event.target.checked ? [...bathsFilter, 3] : bathsFilter.filter((n) => n != 3));
-              }} />
-              <label className="btn btn-outline-primary" htmlFor="bath3">3</label>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" id="bath3+" name='bathroms' checked={minBathsFilter==3} onChange={(event) => {
+                setMinBathsFilter(event.target.checked ? 3 : null)}} />
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath3+">3+</label>
             </div>
 
-            <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath4" checked={bathsFilter.includes(4)} onChange={(event) => {
-                setBathsFilter(event.target.checked ? [...bathsFilter, 4] : bathsFilter.filter((n) => n != 4));
-              }}/>
-              <label className="btn btn-outline-primary" htmlFor="bath4">4</label>
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" id="bath4+" name='bathroms' checked={minBathsFilter==4} onChange={(event) => {
+                setMinBathsFilter(event.target.checked ? 4 : null)}} />
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath4+">4+</label>
             </div>
 
-            <div className='col'>
-              <input type="checkbox" className="btn-check" id="bath5" checked={minBathsFilter} onChange={(event) => {
+            <div className='col px-2'>
+              <input type="radio" className="btn-check" id="bath5+" name='bathroms' checked={minBathsFilter==5} onChange={(event) => {
                 setMinBathsFilter(event.target.checked ? 5 : null)}} />
-              <label className="btn btn-outline-primary" htmlFor="bath5">5+</label>
+              <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath5+">5+</label>
             </div>
           </div>
           
-          <div className='row my-1'>
-            <button className='btn btn-primary' onClick={() => {fetchProperties()}}>
+          <div className='row my-1 mt-3 m-0'>
+            <button className='btn btn-primary' data-bs-dismiss='dropdown' data-bs-target='#baths-dropdown' onClick={() => {
+              if(minBathsFilter != '')
+                setFilterBaths(`${minBathsFilter}+ baths`)
+              else
+                setFilterBaths('Baths')
+              fetchProperties()}}>
               Apply
             </button>
           </div>
@@ -667,36 +615,41 @@ const Buy = () => {
           <div className='card-body'>
             <div className='row mb-1'>
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="houses" checked={areaTypefilter.includes('Plot Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Plot Area'] : areaTypefilter.filter((n) => n != 'Plot Area'));
+                <input type="checkbox" className="form-check-input" id="houses" checked={areaTypefilter.includes('Plot  Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Plot  Area'] : areaTypefilter.filter((n) => n != 'Plot  Area'));
               }}/>
                 <label className='form-check-label' htmlFor="houses">Houses</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="apartments" checked={areaTypefilter.includes('Built-up Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Built-up Area'] : areaTypefilter.filter((n) => n != 'Built-up Area'));
+                <input type="checkbox" className="form-check-input" id="apartments" checked={areaTypefilter.includes('Built-up  Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Built-up  Area'] : areaTypefilter.filter((n) => n != 'Built-up  Area'));
               }}/>
                 <label htmlFor="apartments">Apartments</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="condos" checked={areaTypefilter.includes('Super Built-up Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Super Built-up Area'] : areaTypefilter.filter((n) => n != 'Super Built-up Area'));
+                <input type="checkbox" className="form-check-input" id="condos" checked={areaTypefilter.includes('Super built-up  Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Super built-up  Area'] : areaTypefilter.filter((n) => n != 'Super built-up  Area'));
               }} />
                 <label htmlFor="condos">Condos/Co-ops</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="multi"  checked={areaTypefilter.includes('Carpet Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Carpet Area'] : areaTypefilter.filter((n) => n != 'Carpet Area'));
+                <input type="checkbox" className="form-check-input" id="multi"  checked={areaTypefilter.includes('Carpet  Area')} onChange={(event) => {
+                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Carpet  Area'] : areaTypefilter.filter((n) => n != 'Carpet  Area'));
               }}/>
                 <label htmlFor="multi">Multi-family</label>
               </div>
             </div>
                         
             <div className='row my-1'>
-              <button className='btn btn-primary' onClick={fetchProperties}>
+              <button className='btn btn-primary' onClick={() => {
+                if(areaTypefilter.length > 0)
+                  setFilterHomeType(`Type (${areaTypefilter.length})`)
+                else
+                setFilterHomeType('Type')
+                fetchProperties()}}>
                 Apply
               </button>
             </div>
@@ -704,15 +657,6 @@ const Buy = () => {
       </div>
     )
   }
-
-  useEffect(() => {
-    document.getElementById('search-input').addEventListener('keypress', (event) => {
-      if(event.key == 'Enter') {
-        event.preventDefault();
-        geocodeLocation(event.target.value);
-      }
-    })
-  }, []);
 
 
   return (
@@ -752,10 +696,10 @@ const Buy = () => {
         <div className='filter-section collapse' id="filter-collapse">
           <div className='filter-row d-flex align-items-center'>
             <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
+              <button className='btn btn-text-nowrap dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
                 {filterPrice}
               </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
+              <div className="dropdown-menu m-0 p-0">
                 <div className='card' style={{maxWidth:'320px'}}>
                   <div className='card-header'>
                     <h6>Price Range (in Rs)</h6>
@@ -771,13 +715,13 @@ const Buy = () => {
                     </div>
                     <div className='row mb-3'>
                       <div className='col-5 d-flex justify-content-center'>
-                        <input className='ms-4 ps-2' placeholder='No Min' id='min-price' value={minPriceFilter} onChange={(event) => {setMinPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                        <input className='ms-4 ps-2 filter-input' placeholder='No Min' id='min-price' value={minPriceFilter} onChange={(event) => {setMinPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
                       </div>
                       <div className='col-2 d-flex justify-content-center'>
                         <p>-</p>
                       </div>
                       <div className='col-5 d-flex justify-content-center'>
-                        <input className='me-4 ps-2' placeholder='No Max' id='max-price' value={maxPriceFilter} onChange={(event) => {setMaxPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                        <input className='me-4 ps-2 filter-input' placeholder='No Max' id='max-price' value={maxPriceFilter} onChange={(event) => {setMaxPriceFilter(event.target.value)}} style={{maxWidth:'110px'}} />
                       </div>
                     </div>
                     <div className='row'>
@@ -796,29 +740,29 @@ const Buy = () => {
                     </div>
                   </div>
                 </div>
-                </div>
+              </div>
             </div>
             <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
+              <button className='btn btn-text-nowrap dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
                 {filterBeds}
               </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
+                <div className="dropdown-menu m-0 p-0">
                   <BedsFilterBox/>
                 </div>
             </div>
             <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
+              <button className='btn btn-text-nowrap dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
                 {filterBaths}
               </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
+                <div className="dropdown-menu m-0 p-0" id='baths-dropdown'>
                   <BathsFilterBox/>
                 </div>
             </div>
             <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
+              <button className='btn btn-text-nowrap dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
                 {filterArea}
               </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
+                <div className="dropdown-menu m-0 p-0">
                   <div className='card' style={{maxWidth:'320px'}}>
                     <div className='card-header'>
                       <h6>Area in Sqft</h6>
@@ -834,13 +778,13 @@ const Buy = () => {
                       </div>
                       <div className='row mb-3'>
                         <div className='col-5 d-flex justify-content-center'>
-                          <input className='ms-4 ps-2' placeholder='No Min' id='min-area' value={minAreaFilter} onChange={(event) => {setMinAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                          <input className='ms-4 ps-2 filter-input' placeholder='No Min' id='min-area' value={minAreaFilter} onChange={(event) => {setMinAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
                         </div>
                         <div className='col-2 d-flex justify-content-center'>
                           <p>-</p>
                         </div>
                         <div className='col-5 d-flex justify-content-center'>
-                          <input className='me-4 ps-2' placeholder='No Max' id='max-area' value={maxAreaFilter} onChange={(event) => {setMaxAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
+                          <input className='me-4 ps-2 filter-input' placeholder='No Max' id='max-area' value={maxAreaFilter} onChange={(event) => {setMaxAreaFilter(event.target.value)}} style={{maxWidth:'110px'}} />
                         </div>
                       </div>
                       <div className='row'>
@@ -862,10 +806,10 @@ const Buy = () => {
                 </div>
             </div>
             <div className='col-2 d-flex justify-content-center'>
-              <button className='btn btn-outline-dark dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
+              <button className='btn btn-text-nowrap dropdown-toggle' style={{width:'85%'}} data-bs-toggle='dropdown' data-bs-auto-close="outside" aria-expanded='false'>
                 {filterHomeType}
               </button>
-                <div className="dropdown-menu m-0 p-0" aria-labelledby="appsDropdown">
+                <div className="dropdown-menu m-0 p-0">
                   <HomeTypeFilterBox/>
                 </div>
             </div>
@@ -939,8 +883,7 @@ const Buy = () => {
 
           <footer className="footer py-2 bg-light mt-auto list-section-footer" style={{height:'10vh'}}>
             <div className="container">
-              <p className="text-center text-muted">&copy; 2023 Your Housing Website</p>
-              <Link to="/contact" className="footer-link text-center text-decoration-none">Contact Us</Link>
+              <p className="text-center text-muted">&copy; 2024 Housing</p>
             </div>
           </footer>
         
