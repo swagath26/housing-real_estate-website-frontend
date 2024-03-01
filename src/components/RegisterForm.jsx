@@ -46,8 +46,8 @@ const RegisterForm = () => {
         if (response.data.success) {
             // setSuccessMessage(response.data.messages);
             // setErrorMessage(false);
+            window.bootstrap.Modal.getInstance('#accounts').hide();
             setIsAuthenticated(true);
-            navigate('/');
         }
         else {
             setErrorMessage(true);
@@ -59,93 +59,75 @@ const RegisterForm = () => {
 
     return (
         
-            <div className="card bg-transparent">
-                {errorMessage && 
-                'Something went wrong'
-                }
-                <form>
+        <div className="card">
+            {errorMessage && 'Something went wrong'}
+            <form className="p-2">
                 <div className="row p-2">
-                    <div className="col-2">
-                    <label htmlFor="email" className="col-form-label">Email</label>
-                    </div>
-                    <div className="col-auto g-1">
-                    <MdEmail className="icon" />
-                    </div>
                     <div className="col-auto">
-                    <input type="email" className="form-control" placeholder="Enter your email" id="email" onChange={(event) => setEmail(event.target.value)} aria-describedby="emailHelp"/>
+                        <label htmlFor="email" className="col-form-label">
+                            <MdEmail className="icon" />
+                        </label>
                     </div>
-                    <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
-                </div>
-
-                <div className="row p-2">
-                    <div className="col-3">
-                    <label htmlFor="username" className="col-form-label">Username</label>
-                    </div>
-                    <div className="col-auto g-1">
-                    <FaUser className="icon" />
-                    </div>
-                    <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Provide a username" id="username" onChange={(event) => setUsername(event.target.value)}/>
+                    <div className="col-9">
+                        <input type="email" className="form-control" placeholder="Email Address" id="email" onChange={(event) => setEmail(event.target.value)}/>
                     </div>
                 </div>
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="first_name" className="col-form-label">First Name</label>
+                        <label htmlFor="username" className="col-form-label">
+                            <FaUser className="icon" />
+                        </label>
                     </div>
-                    <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Enter your First Name" id="first_name" onChange={(event) => setFirstName(event.target.value)}/>
+                    <div className="col-6">
+                        <input type="text" className="form-control" placeholder="Username" id="username" onChange={(event) => setUsername(event.target.value)}/>
+                    </div>
+                </div>
+
+                <div className="row p-2">
+                    <div className="col-5">
+                        <input type="text" className="form-control" placeholder="First Name" id="first_name" onChange={(event) => setFirstName(event.target.value)}/>
+                    </div>
+                    <div className="col-5">
+                        <input type="text" className="form-control" placeholder="Last Name" id="last_name" onChange={(event) => setlastName(event.target.value)}/>
                     </div>
                 </div>
 
                 <div className="row p-2">
                     <div className="col-auto">
-                    <label htmlFor="last_name" className="col-form-label">Last Name</label>
+                        <label htmlFor="password1" className="col-form-label">
+                            <FaLock className="icon" />
+                        </label>
                     </div>
                     <div className="col-auto">
-                    <input type="text" className="form-control" placeholder="Enter your last Name" id="last_name" onChange={(event) => setlastName(event.target.value)}/>
-                    </div>
-                </div>
-
-                <div className="row p-2">
-                    <div className="col-auto">
-                    <label htmlFor="password1" className="col-form-label">Password</label>
-                    </div>
-                    <div className="col-auto g-1">
-                    <FaLock className="icon" />
-                    </div>
-                    <div className="col-auto">
-                    <input type="password" className="form-control" placeholder="Create a password" id="password1" onChange={(event) => setPassword1(event.target.value)} aria-describedby="passwordHelp"/>
+                        <input type="password" className="form-control" placeholder="Create a password" id="password1" onChange={(event) => setPassword1(event.target.value)} aria-describedby="passwordHelp"/>
                     </div>
                     <div id="passwordHelp" className="form-text">Password must be 8-20 characters long</div>
                 </div>
 
                 <div className="row p-2">
-                    <div className="col-3">
-                        <label htmlFor="password2" className="col-form-label">Confirm Password</label>
-                    </div>
-                    <div className="col-auto g-1">
-                    <FaLock className="icon" />
+                    <div className="col-auto">
+                        <label htmlFor="password2" className="col-form-label">
+                            <FaLock className="icon" />
+                        </label>
                     </div>
                     <div className="col-auto">
-                    <input type="password" className="form-control" placeholder="Confirm password" id="password2" onChange={(event) => setPassword2(event.target.value)} />
+                        <input type="password" className="form-control" placeholder="Confirm password" id="password2" onChange={(event) => setPassword2(event.target.value)} />
                     </div>
                 </div>
 
-                <div className="row ps-3 g-2">
-                    <div className="col-auto">
-                    <input type="checkbox" className="form-check-input" id="rememberme" onChange={(event) => {setRememberme(event.target.checked)}} />
+                <div className="row p-2">
+                    <div className="col-auto d-flex align-items-center">
+                        <input type="checkbox" className="form-check-input m-0" id="rememberme" onChange={(event) => {setRememberme(event.target.checked)}} />
+                        <label htmlFor="rememberme" className="form-check-label ms-2">Remember me</label>
                     </div>
-                    <div className="col-auto">
-                    <label htmlFor="rememberme" className="form-check-label">Remember me</label>
-                    </div>
-                    <div className="col-6 ps-3 pb-2 mt-0 d-flex justify-content-center align-items-stretch">
+                    <div className="col-auto ms-3 d-flex align-items-center">
                     <button type="submit" className="btn btn-primary" onClick={handleRegister}>Register</button>
                     </div>
                 </div>
                 
-                </form>
-            </div>
+            </form>
+        </div>
         
     )
 }

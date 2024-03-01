@@ -3,12 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from './AuthContext';
+import Accounts from './Accounts';
 import axios from 'axios';
 import './HomePage.css';
 
 const Header = () => {
 
   const isAuthenticated = useContext(AuthContext).isAuthenticated;
+  const setIsAuthenticated = useContext(AuthContext).setIsAuthenticated;
+
+  const handleSignout = async () => {
+    const response = await axios.get('/api/members/signout/');
+    if (response.data.success) {
+        setIsAuthenticated(false);
+    }
+  }
 
   return (
     <header className="header home-header px-3 py-0 pt-3">
@@ -40,12 +49,14 @@ const Header = () => {
                     Utilities
                   </button>
                     <ul className="dropdown-menu">
-                      <li data-bs-dismiss="offcanvas"><Link to="/price_estimator" className="dropdown-item">Price Estimator</Link></li>
-                      <li data-bs-dismiss="offcanvas"><Link to="/recommend_location" className="dropdown-item">Location Estimator</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link className="dropdown-item">Price Estimator</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link className="dropdown-item">Location Estimator</Link></li>
                     </ul>
                 </li>
                 {!isAuthenticated && 
-                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/accounts" className="nav-link text-light">Signin</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas">
+                  <Link to="/accounts" className='nav-link text-light' data-bs-toggle='modal' data-bs-target='#accounts'>Signin</Link>
+                </li>
                 }
                 {isAuthenticated && 
                 <li className="nav-item px-2 dropdown">
@@ -53,9 +64,9 @@ const Header = () => {
                     Accounts
                   </button>
                     <ul className="dropdown-menu" aria-labelledby="appsDropdown">
+                      <li data-bs-dismiss="offcanvas"><Link className="dropdown-item">Profile</Link></li>
                       <li data-bs-dismiss="offcanvas"><Link to="/saved_properties" className="dropdown-item">Saved Properties</Link></li>
-                      <li data-bs-dismiss="offcanvas"><Link to="/liked_properties" className="dropdown-item">Liked Properties</Link></li>
-                      <li data-bs-dismiss="offcanvas"><Link to="/signout" className="nav-link">Sign Out</Link></li>
+                      <li data-bs-dismiss="offcanvas"><Link className="dropdown-item" onClick={handleSignout}>Sign Out</Link></li>
                     </ul>
                 </li>
                 }
@@ -65,6 +76,14 @@ const Header = () => {
           </div>
         </div>
       </nav>
+      <div className="modal fade" id="accounts">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <button type="button" style={{position:'absolute', right:'8px', top:'8px'}} className="btn-close m-0" data-bs-dismiss="modal" aria-label="Close" />
+            <Accounts />
+          </div>
+        </div>
+      </div>
     </header>
   )
 }
@@ -110,7 +129,7 @@ const TopView = () => {
                       </button>
                     </div>
                   </div>
-                  <div className='col-sm-1 col-lg-2 xol-xl-3'></div>
+                  <div className='col-sm-1 col-lg-2 col-xl-3'></div>
                 </div>
             </div>
           </div>
@@ -124,10 +143,10 @@ const PropertyCard = ({ property }) => {
     style: 'currency',
     currency: 'INR'
   });
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   return (
-      <div className='card property-card' style={{width:'370px'}}>
+      <div className='card property-card' style={{width:'350px'}}>
          {/* onClick={() => navigate(`/property_details/${property.id}`)} */}
         <div className='card-img-top' style={{overflow:'hidden'}}>
           <img style={{width:'100%', height:'180px', objectFit:'cover'}} src={property.images && property.images.length > 0 && property.images[0].image} alt={`Property ${property.id}`} />
@@ -155,6 +174,7 @@ const RecommendedSection = () => {
 
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchProperties = async () => {
     try {
@@ -179,24 +199,24 @@ const RecommendedSection = () => {
 
   const handlePreviousSlide = () => {
     const scrollContainer = document.getElementById('property-scroll-div');
-    var scrollby = -300
+    var scrollby = -350
     if (scrollContainer.clientWidth >= 1320) {
-      scrollby = -1000;
+      scrollby = -1050;
     }
     else if (scrollContainer.clientWidth >= 960) {
-      scrollby = -600;
+      scrollby = -700;
     }
     scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
   }
 
   const handleNextSlide = () => {
     const scrollContainer = document.getElementById('property-scroll-div');
-    var scrollby = 300;
+    var scrollby = 350;
     if (scrollContainer.clientWidth >= 1320) {
-      scrollby = 1000;
+      scrollby = 1050;
     }
     else if (scrollContainer.clientWidth >= 960) {
-      scrollby = 600;
+      scrollby = 700;
     }
     scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
   }
@@ -212,7 +232,7 @@ const RecommendedSection = () => {
     scrollLeftButton.style.opacity = isAtLeftEdge ? 0.5 : 1;
     scrollLeftButton.style.cursor = isAtLeftEdge ? 'default' : 'pointer';
     scrollRightButton.style.opacity = isAtRightEdge ? 0.5 : 1;
-    scrollRightButton.style.pointerEvents = isAtRightEdge ? 'default' : 'pointer';
+    scrollRightButton.style.cursor = isAtRightEdge ? 'default' : 'pointer';
   }
 
   return (
@@ -236,8 +256,9 @@ const RecommendedSection = () => {
               <PropertyCard property={property} />
             </li>
           ))} 
-          <li className='property-card-div px-3'>
-            <button className='btn btn-primary'>Browse For <br/> More</button>
+          <li className='property-card-div h-100 px-3'>
+            <button className='btn btn-outline-primary d-flex align-items-center' onClick={() => navigate(`/buy`)}>
+              Browse for<br/> More</button>
           </li>
         </ul>
         }
@@ -248,6 +269,7 @@ const RecommendedSection = () => {
 const Homepage = () => {
   
   const user = useContext(AuthContext).user;
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -258,7 +280,7 @@ const Homepage = () => {
         <div className='row'>
 
           <div className='col-lg-4 p-3'>
-            <div className='card nav-card' id='buy-card'>
+            <div className='card nav-card' id='buy-card' onClick={() => navigate(`/buy`)}>
               <div className='row p-2 m-0 d-flex justify-content-center'>
                 <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
                   <img src="/static/img/buy.jpg" style={{width:'100%', maxWidth:'350px'}}/>
@@ -282,7 +304,7 @@ const Homepage = () => {
           </div>
 
           <div className='col-lg-4 p-3'>
-            <div className='card nav-card' id='sell-card'>
+            <div className='card nav-card' id='sell-card' onClick={() => navigate(`/sell`)}>
               <div className='row p-2 m-0 d-flex justify-content-center'>
                 <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
                   <img src="/static/img/sell.jpg" style={{width:'100%', maxWidth:'350px'}}/>

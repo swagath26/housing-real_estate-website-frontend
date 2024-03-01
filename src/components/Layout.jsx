@@ -7,7 +7,6 @@ import Buy from './Buy';
 import Contact from './Contact';
 import Sell from './Sell';
 import PriceEstimator from './PriceEstimator';
-import LocationRecommendation from './LocationRecommendation';
 import SellHome from './SellHome';
 import About from './About';
 import ForgotPasswordPage from './ForgotPasswordPage';
@@ -30,14 +29,14 @@ const Layout = () => {
             <Route path="/sell" element={<Sell />} />
             <Route path="/sell_home" element={<SellHome/>}/>
             <Route path="/about" element={<About />} />
-            <Route path="/price_estimator" element={<PriceEstimator />} />
-            <Route path="/recommend_location" element={<LocationRecommendation />} />
-            <Route path='/contact' element={<Contact />} />
+            {/* <Route path="/price_estimator" element={<PriceEstimator />} /> */}
+            {/* <Route path="/recommend_location" element={<LocationRecommendation />} /> */}
+            {/* <Route path='/contact' element={<Contact />} /> */}
             <Route path='/accounts' element={<Accounts />} />
-            <Route path='/signout' element={<SignoutPage />} />
-            <Route path='/forgot-password' element={<ForgotPasswordPage />} />
-            <Route path='/property_details/:property_id' element={<PropertyDetails />}/>
-            <Route path='/edit-property/:property_id' element={<EditProperty />} />
+            {/* <Route path='/signout' element={<SignoutPage />} /> */}
+            {/* <Route path='/forgot-password' element={<ForgotPasswordPage />} /> */}
+            {/* <Route path='/property_details/:property_id' element={<PropertyDetails />}/>
+            <Route path='/edit-property/:property_id' element={<EditProperty />} /> */}
           </Routes>
         </main>
         <Footer />

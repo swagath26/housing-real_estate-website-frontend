@@ -6,7 +6,7 @@ const Sell = () => {
         <div>
             <div className="container px-5 pt-5 pb-3">
                 <div className="row">
-                    <div className="col-8">
+                    <div className="col-xl-8">
                             <h1 className="pb-3">Sell with a partner agent</h1>
                             <p>Housing helps you sell your home, your way. Easily explore your selling options 
                                 below and get personalized market value estimates — we can even help you choose 
@@ -23,7 +23,7 @@ const Sell = () => {
             </div>
             <div className="container p-5">
                 <div className="row">
-                    <div className="col-8">
+                    <div className="col-xl-8">
                             <h1 className="pb-3">Sell your home yourself</h1>
                             <p> Deciding to sell your home yourself is referred to as for-sale-by-owner (FSBO). 
                                 The FSBO process is similar to traditional selling, but without the help of a 
@@ -33,7 +33,7 @@ const Sell = () => {
 
                 </div>
                 <div className="row">
-                    <div className="col-4">
+                    <div className="col-8">
                         <Link to="/sell_home" className="btn btn-primary">
                             Post your home for sale
                         </Link>
@@ -44,9 +44,9 @@ const Sell = () => {
                     <a href="#" className="link">Learn more about FSBO</a>
                 </div>
                 <br />
-                <div className="row">
-                    <div className="col-4">
-                        <h3>Why Sell</h3>
+                <div className="row mt-3">
+                    <div className="col-xxl-4 col-md-6 py-2">
+                        <h3 className="mb-4">Why Sell</h3>
                         <ul>
                             <li>
                                 <p>Avoid paying a listing agent commission</p>
@@ -59,8 +59,8 @@ const Sell = () => {
                             </li>
                         </ul>
                     </div>
-                    <div className="col-4">
-                        <h3>How to Sell</h3>
+                    <div className="col-xxl-4 col-md-6 py-2">
+                        <h3 className="mb-3">How to Sell</h3>
                         <p>When selling yourself, start with home prep, staging, and hiring a professional 
                             photographer. Once your marketing materials are ready, research comparable homes 
                             to help price your home. Then, list on Housing. You’ll likely host home showings 

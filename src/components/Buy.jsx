@@ -861,11 +861,11 @@ const Buy = () => {
                 ))}
               </div>
 
-              <div className='row p-4 m-0'>
+              <div className='row py-4 m-0'>
                 <div className='col-4 d-flex justify-content-center'>
                   <button className='btn btn-primary' onClick={handlePreviousPage}>Previous</button>
                 </div>
-                <div className='col-4 d-flex justify-content-center'>
+                <div className='col-4 px-0 d-flex justify-content-center align-items-center'>
                   <span>Page {showCurrentPage} of {pageCount} </span>
                 </div>
                 <div className='col-4 d-flex justify-content-center'>

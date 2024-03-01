@@ -1,17 +1,26 @@
 import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from './AuthContext';
-import { useLocation } from 'react-router-dom';
+import Accounts from './Accounts';
+import axios from 'axios';
 
 const Header = () => {
 
   const isAuthenticated = useContext(AuthContext).isAuthenticated;
+  const setIsAuthenticated = useContext(AuthContext).setIsAuthenticated;
 
   const location = useLocation();
   if ((location.pathname == '/' || location.pathname == '')) {
     return null;
+  }
+
+  const handleSignout = async () => {
+    const response = await axios.get('/api/members/signout/');
+    if (response.data.success) {
+        setIsAuthenticated(false);
+    }
   }
 
   return (
@@ -32,7 +41,6 @@ const Header = () => {
           </button>
           <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby='offcanvasNavbarLabel'>
             <div className='offcanvas-header'>
-              {/* <h5 className='offcanvas-title' id='offcanvasNavbarLabel'>Close</h5> */}
               <button type='button' className='btn-close' data-bs-dismiss="offcanvas" aria-label='Close'></button>
             </div>
             <div className='offcanvas-body justify-content-end pe-3'>
@@ -44,12 +52,14 @@ const Header = () => {
                     Utilities
                   </button>
                   <ul className="dropdown-menu" aria-labelledby="appsDropdown">
-                    <li><Link to="/price_estimator" className="dropdown-item" data-bs-dismiss="offcanvas">Price Estimator</Link></li>
-                    <li><Link to="/recommend_location" className="dropdown-item" data-bs-dismiss="offcanvas">Location Estimator</Link></li>
+                    <li><Link className="dropdown-item" data-bs-dismiss="offcanvas">Price Estimator</Link></li>
+                    <li><Link className="dropdown-item" data-bs-dismiss="offcanvas">Location Estimator</Link></li>
                   </ul>
                 </li>
                 {!isAuthenticated && 
-                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/accounts" className="nav-link">Signin</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas">
+                  <Link to="/accounts" className='nav-link' data-bs-toggle='modal' data-bs-target='#accounts'>Signin</Link>
+                </li>
                 }
                 {isAuthenticated && 
                 <li className="nav-item px-2 dropdown">
@@ -57,9 +67,9 @@ const Header = () => {
                     Accounts
                   </button>
                   <ul className="dropdown-menu" aria-labelledby="appsDropdown">
-                    <li><Link to="/saved_properties" className="dropdown-item" data-bs-dismiss="offcanvas">Saved Properties</Link></li>
-                    <li><Link to="/liked_properties" className="dropdown-item" data-bs-dismiss="offcanvas">Liked Properties</Link></li>
-                    <li><Link to="/signout" className="nav-link" data-bs-dismiss="offcanvas">Sign Out</Link></li>
+                    <li data-bs-dismiss="offcanvas"><Link className="dropdown-item">Profile</Link></li>
+                    <li data-bs-dismiss="offcanvas"><Link to="/saved_properties" className="dropdown-item">Saved Properties</Link></li>
+                    <li data-bs-dismiss="offcanvas"><Link className="dropdown-item" onClick={handleSignout}>Sign Out</Link></li>
                   </ul>
                 </li>
                 }
@@ -69,6 +79,15 @@ const Header = () => {
           </div>
         </div>
       </nav>
+
+      <div className="modal fade" id="accounts">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <button type="button" style={{position:'absolute', right:'8px', top:'8px'}} className="btn-close m-0" data-bs-dismiss="modal" aria-label="Close" />
+            <Accounts />
+          </div>
+        </div>
+      </div>
     </header>
   );
 };

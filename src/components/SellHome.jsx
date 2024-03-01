@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import getCookie from './getCookie';
+import AuthContext from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 import './SellHome.css'
 
 const SellHome = () => {
 
     const navigate = useNavigate();
+    const isAuthenticated = useContext(AuthContext).isAuthenticated;
     
     const [location, setLocation] = useState('');
     const [address, setAddress] = useState('');
@@ -29,23 +31,8 @@ const SellHome = () => {
         setImages(newImages);
     }
 
-    const [successMessage, setSuccessMessage] = useState(null);
+    // const [successMessage, setSuccessMessage] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
-
-    function clearFields() {
-        setLocation('');
-        setAddress('');
-        setDescription('');
-        setPrice('');
-        setBedrooms('');
-        setBathrooms('');
-        setBalcony(false);
-        setArea('');
-        setAreaType('');
-        setDateOfAvailability(new Date());
-        setReadyToMove(false);
-        setImages([]);
-    }
 
     const csrftoken = getCookie('csrftoken');
 
@@ -64,152 +51,235 @@ const SellHome = () => {
         formData.append('area', area);
         formData.append('area_type', areaType);
 
-        formData.append('date_of_availability', dateOfAvailability);
         formData.append('ready_to_move', readyToMove);
         
         images.forEach((image, index) => {
             formData.append('images', image, `images[${index}]`);
         });
         
-        for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-          }
+        // for (const [key, value] of formData.entries()) {
+        //     console.log(`${key}: ${value}`);
+        //   }
 
         try {
             const response = await axios.post('/api/add/', formData, {headers: { 'X-CSRFToken': csrftoken }});
-            console.log(response);
-            setSuccessMessage(response.data.message);
-            setErrorMessage(null);
-            navigate('/sell')
+            // console.log(response);
+            if(response.data.success) {
+                // setSuccessMessage(response.data.message);
+                // setErrorMessage(null);
+                navigate('/sell');
+            }
+            else {
+                console.log(response.data.errors);
+            }
         }
         catch (error) {
-            setErrorMessage(error.response.data.errors || 'Something went wrong!')
-            console.log(error.response);
+            setErrorMessage('Something went wrong!');
         }
     }
 
+    const [isAddNav, setIsAddNav] = useState(false);
+
+    useEffect(() => {
+        const basicDetails = document.getElementById('basic-details');
+        const addDetails = document.getElementById('add-details');
+        if(isAddNav) {
+            basicDetails.style.display = 'none';
+            addDetails.style.display = 'block';
+        }
+        else {
+            addDetails.style.display = 'none';
+            basicDetails.style.display = 'block';
+        }
+    }, [isAddNav])
+
+    useEffect(() => {
+        if(!isAuthenticated)
+            window.bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToast')).show();
+    }, [])
+
     
     return (
-        <div className="container">
+        <div className="container mb-2">
             <div className="row">
                 <h1 className="d-flex justify-content-center" style={{fontFamily:'serif'}}>Post for a Sale by Owner Listing</h1><br/>
-                <div className="col-6 py-4">
-                    <img src="/static/img/sell-property.avif" alt="sell home image"/>
+                <div className="col-xxl-6 py-3 pt-4">
+                    <img src="/static/img/sell-property.avif" alt="sell home image" style={{maxWidth:'100%'}}/>
                 </div>
 
-                <div className="col-6 py-4">
-                    <h5 className="p-0">Enter basic details </h5><br/>
-                    <form hidden>
+                <div className="col-xxl-6 py-3">
+
+                    <ul className="row nav nav-underline mb-3">
+                        <li className='col-auto nav-item ps-4 px-2'>
+                            <a className={`fs-6 nav-link ${!isAddNav ? 'active' : ''}`} id="basic-nav" style={{fontWeight:'600', color:'#222222', cursor:'pointer'}} onClick={() => {
+                                setIsAddNav(false);
+                            }}>Enter Basic Details</a>
+                        </li>
+                        <li className='col-auto nav-item ps-4 pe-2'>
+                            <a className={`fs-6 nav-link ${isAddNav ? 'active' : ''}`} id="add-nav" style={{fontWeight:'600', color:'#222222', cursor:'pointer'}} onClick={() => {
+                                document.getElementById('basic-details').classList.add('was-validated');
+                                if(document.getElementById('basic-details').checkValidity()) {
+                                    setIsAddNav(true);
+                                }
+                            }}>Additional Details</a>
+                        </li>
+                    </ul>
+
+                    <form id="basic-details" className="sell-form needs-validation" noValidate>
                         <div className="row m-0">
-                            <div className={`form-group-sellpage ${location ? 'filled' : ''} m-2 p-0`}>
-                                <input type="text" className="form-control-sellpage" style={{width:'60%'}} id="location" value={location} onChange={(event) => {setLocation(event.target.value)}} required/>
-                                <label for="location" className="sellpage-label">Location</label>
+                            <div className={`d-flex form-group-sellpage ${location ? 'filled' : ''} m-2 p-0`}>
+                                <input type="text" className="form-control form-control-sellpage" style={{width:'50%'}} id="location" value={location} onChange={(event) => {setLocation(event.target.value)}} required/>
+                                <label htmlFor="location" className="sellpage-label px-0">Location</label>
+                                <div className="invalid-feedback mx-2 p-2" style={{width:'30%'}}>
+                                    Invalid Location
+                                </div>
                             </div>
                         </div>
 
                         <div className="row m-0">
                             <div className={`form-group-sellpage ${address ? 'filled' : ''} m-2 p-0`}>
-                                <input type="text" className="form-control-sellpage" style={{width:'90%'}} id="address" value={address} onChange={(event) => {setAddress(event.target.value)}} required/>
-                                <label for="address" className="sellpage-label">Street Address</label>
+                                <input type="text" className="form-control form-control-sellpage" style={{width:'90%'}} id="address" value={address} onChange={(event) => {setAddress(event.target.value)}} required/>
+                                <label htmlFor="address" className="sellpage-label">Street Address</label>
+                                <div className="invalid-feedback ps-2">
+                                    Invalid address
+                                </div>
                             </div>
                         </div>
 
-                            <div className="row m-0">
-                                <div className={`form-group-sellpage ${bedrooms ? 'filled' : ''} m-2 p-0`} style={{width:'40%'}} >
-                                    <input type="number" className="form-control-sellpage" style={{width:'100%'}} id="bedrooms" value={bedrooms} onChange={(event) => {setBedrooms(event.target.value)}} required/>
-                                    <label for="bedrooms" className="sellpage-label">Bedrooms</label>
-                                </div>
-
-                                <div className={`form-group-sellpage ${bathrooms ? 'filled' : ''} m-2 p-0`} style={{width:'40%'}} >
-                                    <input type="number" className="form-control-sellpage" style={{width:'100%'}} id="bathrooms" value={bathrooms} onChange={(event) => {setBathrooms(event.target.value)}} required/>
-                                    <label for="bathrooms" className="sellpage-label">Bathrooms</label>
+                        <div className="row m-0">
+                            <div className={`form-group-sellpage ${bedrooms ? 'filled' : ''} m-2 p-0`} style={{width:'40%'}} >
+                                <input type="number" className="form-control form-control-sellpage" style={{width:'100%'}} id="bedrooms" value={bedrooms} onChange={(event) => {setBedrooms(event.target.value)}} required/>
+                                <label htmlFor="bedrooms" className="sellpage-label">Bedrooms</label>
+                                <div className="invalid-feedback ps-2">
+                                    Provide a valid number
                                 </div>
                             </div>
 
-                            <div className="row m-0">
-                                <div class="input-group m-2 p-0">
-                                    <label class="input-text px-3 p-1 pb-3" style={{color:'#555555'}} for="images">Upload Images</label>
-                                    <input type="file" multiple className="form-control" id="images" onChange={handleImageUpload} />
+                            <div className={`form-group-sellpage ${bathrooms ? 'filled' : ''} m-2 p-0`} style={{width:'40%'}} >
+                                <input type="number" className="form-control form-control-sellpage" style={{width:'100%'}} id="bathrooms" value={bathrooms} onChange={(event) => {setBathrooms(event.target.value)}} required/>
+                                <label htmlFor="bathrooms" className="sellpage-label">Bathrooms</label>
+                                <div className="invalid-feedback ps-2">
+                                    Provide a valid number
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="row m-0 mt-2">
-                                <div class="form-check form-check-reverse d-flex ms-2 p-0" style={{width:'50%'}} >
-                                    <label class="form-check-label p-1 ps-3" for="balcony" style={{color:'#555555'}}>
-                                        Balcony
-                                    </label>
-                                    <input class="form-check-input m-2 ms-3 ps-3" type="checkbox" onChange={(event) => {setBalcony(event.target.checked)}} id="balcony" style={{borderColor:'#bbbbbb', scale:'1.25'}}/>
-                                </div>
-
-                                <div className='m-2 p-0 d-flex justify-content-center align-items-center' style={{width:'40%'}} >
-                                    <button className="btn btn-success">
-                                        Continue
-                                    </button>
+                        <div className="row m-0">
+                            <div className="input-group m-2 p-0">
+                                <label className="input-text px-2 p-1 pb-3" style={{color:'#555555'}} htmlFor="images">Upload Images</label>
+                                <input type="file" multiple className="form-control" id="images" onChange={handleImageUpload} required/>
+                                <div className="invalid-feedback ps-2">
+                                    Upload atleast an image
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="row m-0">
+                            <div className="form-check form-check-reverse d-flex align-items-center m-2 p-0" style={{width:'50%'}} >
+                                <label className="form-check-label p-1 ps-3" htmlFor="balcony" style={{color:'#555555'}}>
+                                    Balcony
+                                </label>
+                                <input className="form-check-input m-2 ms-3 ps-2" type="checkbox" onChange={(event) => {setBalcony(event.target.checked)}} id="balcony" style={{borderColor:'#bbbbbb', scale:'1.25'}}/>
+                            </div>
+
+                            <div className='m-2 p-0 d-flex justify-content-center align-items-center' style={{width:'40%'}} >
+                                <button type="button" className="btn btn-success" id="continue-button" onClick={() => {
+                                    document.getElementById('basic-details').classList.add('was-validated');
+                                        if(document.getElementById('basic-details').checkValidity()) {
+                                            setIsAddNav(true);
+                                        }
+                                    }}>
+                                    Continue
+                                </button>
+                            </div>
+                        </div>
                     </form>
 
-                    <form>
+
+                    <form style={{display:'none'}} id="add-details"className="sell-form needs-validation" noValidate>
                         <div className="row m-0">
                             <div className={`form-group-sellpage ${description ? 'filled' : ''} m-2 p-0`}>
-                                <textarea type="text" className="form-control-sellpage" style={{width:'60%'}} id="description" value={description} onChange={(event) => {setDescription(event.target.value)}} required/>
-                                <label for="description" className="sellpage-label">Add Description</label>
+                                <textarea type="text" className="form-control-sellpage" style={{width:'60%'}} id="description" value={description} onChange={(event) => {setDescription(event.target.value)}}/>
+                                <label htmlFor="description" className="sellpage-label">Add Description</label>
                             </div>
                         </div>
 
-                            <div className="row m-0">
-                                <div className={`input-group form-group-sellpage ${area ? 'filled' : ''} m-2 p-0`} style={{width:'40%'}} >
-                                    <input type="number" className="form-control-sellpage" style={{width:'60%'}} id="area" value={area} onChange={(event) => {setArea(event.target.value)}} required/>
-                                    <label for="area" className="sellpage-label">Area</label>
-                                    <span class="input-group-text">Sqft</span>
-                                </div>
-
-                                <div class="input-group m-2 p-0" style={{width:'40%'}}>
-                                    <label class="input-group-text" for="inputGroupSelect01">Home Type</label>
-                                    <select class="form-select" id="inputGroupSelect01">
-                                        <option selected>Choose...</option>
-                                        <option value="1">House</option>
-                                        <option value="2">Apartment</option>
-                                        <option value="3">Studio</option>
-                                        <option value="3">Multi-Family</option>
-                                    </select>
-                                </div>
+                        <div className="row m-0">
+                            <div className={`input-group form-group-sellpage ${area ? 'filled' : ''} m-2 p-0`} style={{width:'40%', minWidth:'200px'}} >
+                                <input type="number" className="form-control-sellpage" style={{width:'60%', height:'40px'}} id="area" value={area} onChange={(event) => {setArea(event.target.value)}}/>
+                                <label htmlFor="area" className="sellpage-label">Area</label>
+                                <span className="input-group-text" style={{height:'40px'}}>Sqft</span>
                             </div>
+
+                            <div className="input-group m-2 p-0" style={{width:'50%', minWidth:'300px'}}>
+                                <label className="input-group-text p-0 d-flex justify-content-center" htmlFor="hometype" style={{width:'40%', minWidth:'100px'}}>Home Type</label>
+                                <select className="form-control-sellpage m-0 py-0" style={{width:'60%', height:'40px'}} id="hometype">
+                                    <option defaultValue={''}>Choose...</option>
+                                    <option value="1">House</option>
+                                    <option value="2">Apartment</option>
+                                    <option value="3">Studio</option>
+                                    <option value="3">Multi-Family</option>
+                                </select>
+                            </div>
+                        </div>
 
 
                         <div className="row m-0">
-                            <label class="px-3 p-1 pb-3" style={{color:'#555555'}} for="date_of_availability">Available On</label>
-                            <input type="date" className="form-control mx-2 p-2 ps-3" id="date_of_availability"style={{width:'40%'}} value={dateOfAvailability} onChange={(event) => {setDateOfAvailability(event.target.value)}}/>
+                            <label className="px-3 p-1 pb-3" style={{color:'#555555'}} htmlFor="date_of_availability">Available On</label>
+                            <input type="date" className="form-control-sellpage mx-2 p-2 ps-3" id="date_of_availability"style={{width:'40%'}} value={dateOfAvailability} onChange={(event) => {setDateOfAvailability(event.target.value)}}/>
                                                         
-                                <div class="form-check form-check-reverse d-flex ms-2 p-0" style={{width:'50%'}} >
-                                    <label class="form-check-label p-1 ps-3" for="balcony" style={{color:'#555555'}}>
-                                        Ready To Move
-                                    </label>
-                                    <input class="form-check-input m-2 ms-3 ps-3" type="checkbox" onChange={(event) => {setBalcony(event.target.checked)}} id="balcony" style={{borderColor:'#bbbbbb', scale:'1.25'}}/>
-                                </div>
-                            
+                            <div className="form-check form-check-reverse d-flex ms-2 p-0" style={{width:'50%'}} >
+                                <label className="form-check-label p-1 ps-3" htmlFor="ready_to_move" style={{color:'#555555'}}>
+                                    Ready To Move
+                                </label>
+                                <input className="form-check-input m-2 ms-3 ps-3" type="checkbox" onChange={(event) => {setReadyToMove(event.target.checked)}} id="ready_to_move" style={{borderColor:'#bbbbbb', scale:'1.25'}}/>
+                            </div>
                         </div>
 
-                        {errorMessage && <div>{errorMessage}</div>}
-                        {successMessage && <div>{successMessage}Uploaded</div>}
-
-                            <div className="row m-0 my-2">
-                                <label class="px-3 p-1 py-3" style={{color:'#555555'}} for="price">Your Price for the Property</label>
-                                
-                                <div className="input-group" style={{width:'50%'}} >
-                                    <span class="input-group-text">INR</span>
-                                    <input type="number" className="form-control" id="price" value={price} onChange={(event) => {setPrice(event.target.value)}} required/>
+                        <div className="row m-0 my-2">
+                            <label className="px-3 p-1 py-3" style={{color:'#555555'}} htmlFor="price">Your Price for the Property</label>
+                            <div className="input-group" style={{width:'50%', height:'40px'}} >
+                                <span className="input-group-text">INR</span>
+                                <input type="number" className="form-control m-0" id="price" value={price} onChange={(event) => {setPrice(event.target.value)}} required/>
+                                <div className="invalid-feedback ps-2">
+                                    Provide a Price for your Property
                                 </div>
-
-                                <div className='m-2 p-0 d-flex justify-content-center align-items-center' style={{width:'40%'}} >
-                                    <button type="submit" className="btn btn-primary" onClick={handleSubmitForm}>
-                                        List for Sale
-                                    </button>
-                                </div>
-
                             </div>
-                        
+
+                            <div className='ms-2 p-0 d-flex justify-content-center align-items-center' style={{width:'40%'}} >
+                                <button type="submit" className="btn btn-primary" onClick={(event) => {
+                                    document.getElementById('add-details').classList.add('was-validated');
+                                    if(!isAuthenticated) {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        window.bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToast')).show();
+                                    }
+                                    else if(document.getElementById('add-details').checkValidity()) {
+                                        handleSubmitForm(event);
+                                    }
+                                    else {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                    }
+                                    }}>
+                                    List for Sale
+                                </button>
+                                
+                            </div>
+                        </div>
                     </form>
+                </div>
+                <div className="toast-container position-fixed bottom-0 end-0 p-3">
+                    <div id="liveToast" className="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div className="toast-body">
+                        <div className="d-flex justify-content-end">
+                            <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close" />
+                        </div>
+                        <div className="d-flex justify-content-start p-2">
+                            <b>Sign in to list your property..</b>
+                        </div>
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>
