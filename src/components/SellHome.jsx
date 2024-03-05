@@ -104,7 +104,7 @@ const SellHome = () => {
             <div className="row">
                 <h1 className="d-flex justify-content-center" style={{fontFamily:'serif'}}>Post for a Sale by Owner Listing</h1><br/>
                 <div className="col-xxl-6 py-3 pt-4">
-                    <img src="/static/img/sell-property.avif" alt="sell home image" style={{maxWidth:'100%'}}/>
+                    <img src="/static/img/sell-property2.jpg" alt="sell home image" style={{maxWidth:'100%'}}/>
                 </div>
 
                 <div className="col-xxl-6 py-3">

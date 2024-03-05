@@ -57,16 +57,25 @@ const Buy = () => {
   const [selectedPropertyView, setSelectedPropertyView] = useState(null);
   const [prevSelectedPropertyView, setPrevSelectedPropertyView] = useState(null);
 
-  const icon_1 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon2.png",
+  const icon_std = window.L.icon({
+    iconUrl: "/static/img/map_icon_std.png",
+    shadowUrl: "/static/img/map_icon_shadow.png",
+    iconSize: [14, 14],
+    shadowSize: [16, 16],
   })
 
-  const icon_2 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon3.png",
+  const icon_hover = window.L.icon({
+    iconUrl: "/static/img/map_icon_hover.png",
+    shadowUrl: "/static/img/map_icon_shadow.png",
+    iconSize: [14, 14],
+    shadowSize: [16, 16],
   })
 
-  const icon_3 = window.L.icon({
-    iconUrl: "/static/img/map_std_icon5.png",
+  const icon_select = window.L.icon({
+    iconUrl: "/static/img/map_icon_hover.png",
+    shadowUrl: "/static/img/map_icon_shadow.png",
+    iconSize: [20, 20],
+    shadowSize: [23, 23],
   })
 
   const throttle = (fn, interval) => {
@@ -244,19 +253,21 @@ const Buy = () => {
   }, []);
 
   useEffect(() => {
+
     async function initMap() {
       const map_obj = window.L.map('map', {
         center: center,
         zoom: zoom
       });
-      window.L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-        id: 'mapbox/streets-v11',
-        accessToken: 'pk.eyJ1Ijoic3dha2tpZGkiLCJhIjoiY2xzdWpzd3E2MHljYzJqbXVldm85aW1lNyJ9.nT5EpqI_tMmKqmH29p78gA'
+
+      window.L.maptilerLayer({
+        apiKey: 'cIpY5YW2swGKoC5mFkdK',
+        style: window.L.MaptilerStyle.STREETS,
       }).addTo(map_obj);
-      // window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      // }).addTo(map_obj);
+
       setMap(map_obj);
     }
+
     initMap();
   }, []);
   
@@ -297,7 +308,7 @@ const Buy = () => {
         if (property.latitude && property.longitude) {
           let new_marker = window.L.marker(
             [parseFloat(property.latitude), parseFloat(property.longitude)], 
-            {icon: icon_1}
+            {icon: icon_std}
           ).addTo(map);
           new_marker.bindPopup(property.price)
           markers[property.id] = new_marker;
@@ -314,7 +325,7 @@ const Buy = () => {
 
   useEffect(() => {
     if(prevSelectedPropertyView) {
-      markers[prevSelectedPropertyView.id].setIcon(icon_1);
+      markers[prevSelectedPropertyView.id].setIcon(icon_std);
     }
   }, [prevSelectedPropertyView]);
 
@@ -323,7 +334,7 @@ const Buy = () => {
       const currentPosition = ([parseFloat(selectedPropertyView.latitude), parseFloat(selectedPropertyView.longitude)]);
       setCenter(currentPosition);
       setZoom(16)
-      markers[selectedPropertyView.id].setIcon(icon_2);
+      markers[selectedPropertyView.id].setIcon(icon_hover);
     }
   }, [selectedPropertyView])
 
@@ -356,10 +367,10 @@ const Buy = () => {
     return (
         <div className='card property-card' style={{width:'100vh'}}
           onMouseEnter={() => {
-            selectedPropertyView!=property && markers[property.id] && markers[property.id].setIcon(icon_3)}
+            selectedPropertyView!=property && markers[property.id] && markers[property.id].setIcon(icon_select)}
           }
           onMouseLeave={() => {
-            selectedPropertyView!=property && markers[property.id] && markers[property.id].setIcon(icon_1)}
+            selectedPropertyView!=property && markers[property.id] && markers[property.id].setIcon(icon_std)}
           }
           // onClick={() => navigate(`/property_details/${property.id}`)}
         >

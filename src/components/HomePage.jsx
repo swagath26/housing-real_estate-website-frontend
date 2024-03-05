@@ -104,7 +104,7 @@ const TopView = () => {
   }, []);
   
   return (
-      <div className="view" style={{ backgroundImage: "url(/static/img/housing-bg5.jpg)", backgroundSize:'cover', backgroundRepeat:'no-repeat',  backgroundPosition: 'top'}}>
+      <div className="view" style={{ backgroundImage: "url(/static/img/housing-bg.jpg)", backgroundSize:'cover', backgroundRepeat:'no-repeat',  backgroundPosition: 'top'}}>
         <Header />
         <div className="container-fluid px-0">
           
