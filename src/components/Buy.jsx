@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {Link, useParams} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
