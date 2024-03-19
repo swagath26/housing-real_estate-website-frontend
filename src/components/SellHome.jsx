@@ -31,7 +31,6 @@ const SellHome = () => {
         setImages(newImages);
     }
 
-    // const [successMessage, setSuccessMessage] = useState(null);
     const [errorMessage, setErrorMessage] = useState(null);
 
     const csrftoken = getCookie('csrftoken');

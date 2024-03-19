@@ -29,7 +29,7 @@ const Buy = () => {
   const [bedsFilter, setBedsFilter] = useState([]);
   const [minBedsFilter, setMinBedsFilter] = useState('');
   const [minBathsFilter, setMinBathsFilter] = useState('');
-  const [areaTypefilter, setAreaTypeFilter] = useState([]);
+  const [homeTypefilter, setHomeTypeFilter] = useState([]);
 
   const [minLatFilter, setMinLatFilter] = useState();
   const [maxLatFilter, setMaxLatFilter] = useState();
@@ -39,7 +39,7 @@ const Buy = () => {
   const [map, setMap] = useState(null);
   const [markers] = useState({});
 
-  const [center, setCenter] = useState([13.0, 77.5]);
+  const [center, setCenter] = useState([12.98, 77.58]);
   const [zoom, setZoom] = useState(12);
 
   const [refetch, setRefetch] = useState(false);
@@ -124,7 +124,7 @@ const Buy = () => {
           beds: bedsFilter.join(','),
           min_bed: minBedsFilter,
           min_bath: minBathsFilter,
-          type: areaTypefilter.join(',')
+          type: homeTypefilter.join(',')
 
         },
         signal: controller.signal,
@@ -226,7 +226,7 @@ const Buy = () => {
     setMaxAreaFilter('');
     setMinBedsFilter('');
     setMinBathsFilter('');
-    setAreaTypeFilter([]);
+    setHomeTypeFilter([]);
     setBedsFilter([]);
     setFilterPrice('Price');
     setFilterBaths('Baths');
@@ -349,7 +349,6 @@ const Buy = () => {
 
 
   const PropertyCard = ({ property}) => {
-    // const navigate = useNavigate();
     const IndianRupeeFormatter = new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR'
@@ -372,7 +371,6 @@ const Buy = () => {
           onMouseLeave={() => {
             selectedPropertyView!=property && markers[property.id] && markers[property.id].setIcon(icon_std)}
           }
-          // onClick={() => navigate(`/property_details/${property.id}`)}
         >
 
           <div className='card-top-section'>
@@ -626,29 +624,29 @@ const Buy = () => {
           <div className='card-body'>
             <div className='row mb-1'>
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="houses" checked={areaTypefilter.includes('Plot  Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Plot  Area'] : areaTypefilter.filter((n) => n != 'Plot  Area'));
+                <input type="checkbox" className="form-check-input" id="houses" checked={homeTypefilter.includes('Houses')} onChange={(event) => {
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Houses'] : homeTypefilter.filter((n) => n != 'Houses'));
               }}/>
                 <label className='form-check-label' htmlFor="houses">Houses</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="apartments" checked={areaTypefilter.includes('Built-up  Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Built-up  Area'] : areaTypefilter.filter((n) => n != 'Built-up  Area'));
+                <input type="checkbox" className="form-check-input" id="apartments" checked={homeTypefilter.includes('Apartments')} onChange={(event) => {
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Apartments'] : homeTypefilter.filter((n) => n != 'Apartments'));
               }}/>
                 <label htmlFor="apartments">Apartments</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="condos" checked={areaTypefilter.includes('Super built-up  Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Super built-up  Area'] : areaTypefilter.filter((n) => n != 'Super built-up  Area'));
+                <input type="checkbox" className="form-check-input" id="condos" checked={homeTypefilter.includes('Condos/Co-ops')} onChange={(event) => {
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Condos/Co-ops'] : homeTypefilter.filter((n) => n != 'Condos/Co-ops'));
               }} />
                 <label htmlFor="condos">Condos/Co-ops</label>
               </div>
 
               <div className='form-check'>
-                <input type="checkbox" className="form-check-input" id="multi"  checked={areaTypefilter.includes('Carpet  Area')} onChange={(event) => {
-                setAreaTypeFilter(event.target.checked ? [...areaTypefilter, 'Carpet  Area'] : areaTypefilter.filter((n) => n != 'Carpet  Area'));
+                <input type="checkbox" className="form-check-input" id="multi"  checked={homeTypefilter.includes('Multi-family')} onChange={(event) => {
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Multi-family'] : homeTypefilter.filter((n) => n != 'Multi-family'));
               }}/>
                 <label htmlFor="multi">Multi-family</label>
               </div>
@@ -656,8 +654,8 @@ const Buy = () => {
                         
             <div className='row my-1'>
               <button className='btn btn-primary' onClick={() => {
-                if(areaTypefilter.length > 0)
-                  setFilterHomeType(`Type (${areaTypefilter.length})`)
+                if(homeTypefilter.length > 0)
+                  setFilterHomeType(`Type (${homeTypefilter.length})`)
                 else
                 setFilterHomeType('Type')
                 fetchProperties()}}>
