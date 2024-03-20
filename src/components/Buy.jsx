@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import {Link, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import './Buy.css';
@@ -251,6 +251,7 @@ const Buy = () => {
       geocodeLocation(params.search_query)
   }, []);
 
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
   useEffect(() => {
 
     async function initMap() {
@@ -267,7 +268,8 @@ const Buy = () => {
       setMap(map_obj);
     }
 
-    initMap();
+    !isMapInitialized && initMap();
+    setIsMapInitialized(true);
   }, []);
   
 
@@ -373,11 +375,10 @@ const Buy = () => {
         >
 
           <div className='card-top-section'>
-
             <div className="row m-0 p-0 pt-1" style={{position:'absolute', zIndex:'1', width:'100%'}}>
               <div className='col-10 px-1'>
-                <div className='rounded-3 px-2' style={{backgroundColor:'rgba(0,0,0,0.7)', color:'#f0f0f0', fontSize:'13px', display:'inline-block'}}>
-                  {property.area_type}
+                <div className='rounded-3 px-2' style={{backgroundColor:'rgba(0,0,0,0.7)', paddingBottom:'3px', color:'#f0f0f0', fontSize:'13px', display:'inline-block'}}>
+                  {property.home_type}
                 </div>
               </div>
               <div className='col-2' >
@@ -386,10 +387,8 @@ const Buy = () => {
                 </a>
               </div>
             </div>
-  
             <div id={`property_${property.id}`} className="carousel slide" style={{zIndex:'0'}}>
               <div className="carousel-inner">
-  
                 {property.images && 
                 property.images.map((image, index) => (
                 <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index}>
@@ -398,9 +397,7 @@ const Buy = () => {
                   alt={`Property Image ${index+1}`} />
                 </div>
                 ))}
-  
               </div>
-  
               <div>
                 <button className="carousel-controls carousel-control-prev" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="prev">
                   <FontAwesomeIcon icon={faAngleLeft} style={{fontSize:'30px'}} />
@@ -410,9 +407,7 @@ const Buy = () => {
                   <FontAwesomeIcon icon={faAngleRight} style={{fontSize:'30px'}} />
                 </button>
               </div>
-  
             </div>
-  
           </div>
         
           <div className="card-body p-2" style={{height:'130px'}}>

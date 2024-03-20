@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import AuthContext from './AuthContext';
 import Accounts from './Accounts';
 import axios from 'axios';
@@ -44,15 +45,7 @@ const Header = () => {
               <ul className='navbar-nav text-light'>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/buy" className="nav-link text-light">Buy</Link></li>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/sell" className="nav-link text-light">Sell</Link></li>
-                <li className="nav-item px-2 dropdown">
-                  <button className='btn text-nowrap nav-link dropdown-toggle text-light' data-bs-toggle='dropdown'>
-                    Utilities
-                  </button>
-                    <ul className="dropdown-menu">
-                      <li data-bs-dismiss="offcanvas"><Link className="dropdown-item">Price Estimator</Link></li>
-                      <li data-bs-dismiss="offcanvas"><Link className="dropdown-item">Location Estimator</Link></li>
-                    </ul>
-                </li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/price_estimator" className="nav-link text-light">Estimate</Link></li>
                 {!isAuthenticated && 
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas">
                   <Link to="/accounts" className='nav-link text-light' data-bs-toggle='modal' data-bs-target='#accounts'>Signin</Link>
@@ -143,26 +136,56 @@ const PropertyCard = ({ property }) => {
     style: 'currency',
     currency: 'INR'
   });
-  // const navigate = useNavigate();
 
   return (
       <div className='card property-card' style={{width:'350px'}}>
-         {/* onClick={() => navigate(`/property_details/${property.id}`)} */}
-        <div className='card-img-top' style={{overflow:'hidden'}}>
-          <img style={{width:'100%', height:'180px', objectFit:'cover'}} src={property.images && property.images.length > 0 && property.images[0].image} alt={`Property ${property.id}`} />
-        </div>
+        <div className='card-top-section'>
+            <div className="row m-0 p-0 pt-1" style={{position:'absolute', zIndex:'1', width:'100%'}}>
+              <div className='col-10 px-1'>
+                <div className='rounded-3 px-2' style={{backgroundColor:'rgba(0,0,0,0.7)', paddingBottom:'3px', color:'#f0f0f0', fontSize:'13px', display:'inline-block'}}>
+                  {property.home_type}
+                </div>
+              </div>
+              <div className='col-2' >
+                <a className='favourites-icon' id={`fav_${property.id}`} style={{display:'inline-block'}}>
+                  <img src="/static/img/fav-logo.png"/>
+                </a>
+              </div>
+            </div>
+            <div id={`property_${property.id}`} className="carousel slide" style={{zIndex:'0'}}>
+              <div className="carousel-inner">
+                {property.images && 
+                property.images.map((image, index) => (
+                <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index}>
+                  <img className='w-100 object-fit-cover card-img' style={{height:'160px', overflow:'hidden'}} 
+                  src={image.image}
+                  alt={`Property Image ${index+1}`} />
+                </div>
+                ))}
+              </div>
+              <div>
+                <button className="carousel-controls carousel-control-prev" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="prev">
+                  <FontAwesomeIcon icon={faAngleLeft} style={{fontSize:'30px'}} />
+                </button>
+  
+                <button className="carousel-controls carousel-control-next" type="button" data-bs-target={`#property_${property.id}`} data-bs-slide="next">
+                  <FontAwesomeIcon icon={faAngleRight} style={{fontSize:'30px'}} />
+                </button>
+              </div>
+            </div>
+          </div>
       
         <div className="card-body p-2" style={{height:'130px'}}>
           <h5 className='card-title fw-bold'>{IndianRupeeFormatter.format(property.price)}</h5>
           <div className='card-text'>
             <p style={{fontSize:'16px', margin:'0', textOverflow:'ellipsis', overflow:'hidden', textWrap:'nowrap'}}>
-              <b>{property.bedrooms} </b>bds | <b>{property.bathrooms}</b> ba <b>{property.balcony && ' | Balcony'}</b> | <b>{property.area || '--'}</b> sqft | {property.area_type}
+              <b>{property.bedrooms} </b>bds | <b>{property.bathrooms}</b> ba <b>{property.balcony && ' | Balcony'}</b> | <b>{property.area || '--'}</b> sqft
             </p>
             <p style={{fontSize:'16px', margin:'0', textOverflow:'ellipsis', overflow:'hidden', textWrap:'nowrap'}}>
               {property.address}, {property.location}
             </p>
             <p style={{fontSize:'13px'}}>
-              Listing by: {property.user_first_name} {property.user_last_name} | {property.availability || (property.ready_to_move && 'Ready To Move')}
+              Listing by: {property.user_first_name} {property.user_last_name}
             </p>
           </div>
         </div>
@@ -199,6 +222,7 @@ const RecommendedSection = () => {
 
   const handlePreviousSlide = () => {
     const scrollContainer = document.getElementById('property-scroll-div');
+    const isAtLeftEdge = scrollContainer.scrollLeft < 50;
     var scrollby = -350
     if (scrollContainer.clientWidth >= 1320) {
       scrollby = -1050;
@@ -206,11 +230,13 @@ const RecommendedSection = () => {
     else if (scrollContainer.clientWidth >= 960) {
       scrollby = -700;
     }
-    scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
+    !isAtLeftEdge && scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
   }
 
   const handleNextSlide = () => {
     const scrollContainer = document.getElementById('property-scroll-div');
+    const isAtRightEdge = scrollContainer.scrollLeft + 50 > scrollContainer.scrollWidth - scrollContainer.clientWidth;
+  
     var scrollby = 350;
     if (scrollContainer.clientWidth >= 1320) {
       scrollby = 1050;
@@ -218,7 +244,7 @@ const RecommendedSection = () => {
     else if (scrollContainer.clientWidth >= 960) {
       scrollby = 700;
     }
-    scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
+    !isAtRightEdge && scrollContainer.scrollBy({left: scrollby, behavior:'smooth'});
   }
 
   function updateScrollIconVisibility() {
@@ -230,9 +256,9 @@ const RecommendedSection = () => {
     const isAtRightEdge = scrollContainer.scrollLeft + 50 > scrollContainer.scrollWidth - scrollContainer.clientWidth;
   
     scrollLeftButton.style.opacity = isAtLeftEdge ? 0.5 : 1;
-    scrollLeftButton.style.cursor = isAtLeftEdge ? 'default' : 'pointer';
+    document.getElementById('scroll-left-button-div').style.cursor = isAtLeftEdge ? 'default' : 'pointer';
     scrollRightButton.style.opacity = isAtRightEdge ? 0.5 : 1;
-    scrollRightButton.style.cursor = isAtRightEdge ? 'default' : 'pointer';
+    document.getElementById('scroll-right-button-div').style.cursor = isAtRightEdge ? 'default' : 'pointer';
   }
 
   return (
@@ -240,11 +266,15 @@ const RecommendedSection = () => {
         <div className='row px-3 mx-0'>
           <div className='col-10 col-xl-11 px-0'>
             <h1 className='fs-3'>Homes For You</h1>
-            <p className='lead fs-6'>Based on homes you recently viewed</p>
+            <p className='lead fs-6'>Based on market insights and recently activity</p>
           </div>
           <div className='col-2 col-xl-1 px-0 d-flex align-items-center justify-content-between'>
-            <i id='scroll-left-button' style={{opacity:'0.5'}} className='fa-solid fa-circle-chevron-left' onClick={handlePreviousSlide} />
-            <i id='scroll-right-button' style={{opacity:'1'}} className='fa-solid fa-circle-chevron-right' onClick={handleNextSlide} />
+            <div id="scroll-left-button-div" onClick={handlePreviousSlide}>
+            <i id='scroll-left-button' className='fa-solid fa-chevron-left'/>
+            </div>
+            <div id="scroll-right-button-div" onClick={handleNextSlide}>
+              <i id='scroll-right-button' className='fa-solid fa-chevron-right'/>
+            </div>
           </div>
         </div>
 
@@ -328,14 +358,14 @@ const Homepage = () => {
           </div>
 
           <div className='col-lg-4 p-3'>
-            <div className='card nav-card' id='rent-card'>
+            <div className='card nav-card' id='rent-card' onClick={() => navigate(`/price_estimator`)}>
               <div className='row p-2 m-0 d-flex justify-content-center'>
                 <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
                   <img src="/static/img/rent.jpg" style={{width:'100%', maxWidth:'350px'}}/>
                 </div>
                 <div className='col-lg-12 col-12 col-md-6 p-2'>
                   <div className='row p-2 m-0'>
-                    <h3 className='d-flex justify-content-center' style={{fontFamily:'serif'}}>Rent a home</h3>
+                    <h3 className='d-flex justify-content-center' style={{fontFamily:'serif'}}>Estimate home</h3>
                   </div>
                   <div className='row p-0 py-2 m-0 d-flex align-items-center' style={{height:'120px'}}>
                     <p style={{textAlign:'center', fontSize:'17px'}}>Get a seamless online experience from shopping on the largest 
