@@ -39,7 +39,7 @@ const Buy = () => {
   const [markers] = useState({});
 
   const [center, setCenter] = useState([12.98, 77.58]);
-  const [zoom, setZoom] = useState(12);
+  const [zoom, setZoom] = useState(11);
 
   const [refetch, setRefetch] = useState(false);
   const abortController = useRef(null);
