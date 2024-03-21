@@ -97,10 +97,12 @@ const Buy = () => {
   }
 
   const handleMapFilter = () => {
-    setMinLatFilter(map.getBounds()._southWest.lat);
-    setMaxLatFilter(map.getBounds()._northEast.lat);
-    setMinLngFilter(map.getBounds()._southWest.lng);
-    setMaxLngFilter(map.getBounds()._northEast.lng);
+    if (map.getBounds()._southWest.lat != map.getBounds()._northEast.lat && map.getBounds()._southWest.lng != map.getBounds()._northEast.lng) {
+      setMinLatFilter(map.getBounds()._southWest.lat);
+      setMaxLatFilter(map.getBounds()._northEast.lat);
+      setMinLngFilter(map.getBounds()._southWest.lng);
+      setMaxLngFilter(map.getBounds()._northEast.lng);
+    }
   }
 
   const fetchProperties = async () => {
@@ -151,8 +153,6 @@ const Buy = () => {
   };
 
   const handleMapToggle = () => {
-
-    map && console.log(map.getBounds());
 
     if ((document.getElementById('map-collapse') != null) && (document.getElementById('property-section') != null)) {
 
