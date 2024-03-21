@@ -47,15 +47,7 @@ const Header = () => {
               <ul className='navbar-nav'>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/buy" className="nav-link">Buy</Link></li>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/sell" className="nav-link">Sell</Link></li>
-                <li className="nav-item px-2 dropdown">
-                  <button className='btn text-nowrap nav-link dropdown-toggle' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
-                    Utilities
-                  </button>
-                  <ul className="dropdown-menu" aria-labelledby="appsDropdown">
-                    <li><Link className="dropdown-item" data-bs-dismiss="offcanvas">Price Estimator</Link></li>
-                    <li><Link className="dropdown-item" data-bs-dismiss="offcanvas">Location Estimator</Link></li>
-                  </ul>
-                </li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/price_estimator" className="nav-link">Estimate</Link></li>
                 {!isAuthenticated && 
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas">
                   <Link to="/accounts" className='nav-link' data-bs-toggle='modal' data-bs-target='#accounts'>Signin</Link>
