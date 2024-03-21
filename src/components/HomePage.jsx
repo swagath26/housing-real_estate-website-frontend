@@ -196,11 +196,12 @@ const PropertyCard = ({ property }) => {
 const RecommendedSection = () => {
 
   const [properties, setProperties] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const fetchProperties = async () => {
     try {
+      setIsLoading(true);
       const response = await axios.get('/api/properties_list/', {
         params: {
           page: 1,

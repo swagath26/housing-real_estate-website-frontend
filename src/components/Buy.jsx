@@ -126,7 +126,6 @@ const Buy = () => {
           min_bed: minBedsFilter,
           min_bath: minBathsFilter,
           type: homeTypefilter.join(',')
-
         },
         signal: controller.signal,
       });
