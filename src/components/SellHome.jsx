@@ -20,10 +20,7 @@ const SellHome = () => {
 
     const [balcony, setBalcony] = useState(false);
     const [area, setArea] = useState('');
-    const [areaType, setAreaType] = useState('');
-
-    const [dateOfAvailability, setDateOfAvailability] = useState(new Date());
-    const [readyToMove, setReadyToMove] = useState(false);
+    const [homeType, setHomeType] = useState('');
     
     const [images, setImages] = useState([]);
     const handleImageUpload = (event) => {
@@ -31,12 +28,9 @@ const SellHome = () => {
         setImages(newImages);
     }
 
-    const [errorMessage, setErrorMessage] = useState(null);
-
     const csrftoken = getCookie('csrftoken');
 
-    const handleSubmitForm = async (event) => {
-        event.preventDefault();
+    const handleSubmitForm = async () => {
         const formData = new FormData();
         formData.append('location', location);
         formData.append('address', address);
@@ -48,24 +42,15 @@ const SellHome = () => {
 
         formData.append('balcony', balcony);
         formData.append('area', area);
-        formData.append('area_type', areaType);
-
-        formData.append('ready_to_move', readyToMove);
+        formData.append('home_type', homeType);
         
         images.forEach((image, index) => {
             formData.append('images', image, `images[${index}]`);
         });
-        
-        // for (const [key, value] of formData.entries()) {
-        //     console.log(`${key}: ${value}`);
-        //   }
 
         try {
             const response = await axios.post('/api/add/', formData, {headers: { 'X-CSRFToken': csrftoken }});
-            // console.log(response);
             if(response.data.success) {
-                // setSuccessMessage(response.data.message);
-                // setErrorMessage(null);
                 navigate('/sell');
             }
             else {
@@ -73,7 +58,7 @@ const SellHome = () => {
             }
         }
         catch (error) {
-            setErrorMessage('Something went wrong!');
+            console.log(error);
         }
     }
 
@@ -103,24 +88,24 @@ const SellHome = () => {
             <div className="row">
                 <h1 className="d-flex justify-content-center" style={{fontFamily:'serif'}}>Post for a Sale by Owner Listing</h1><br/>
                 <div className="col-xxl-6 py-3 pt-4">
-                    <img src="/static/img/sell-property2.jpg" alt="sell home image" style={{maxWidth:'100%'}}/>
+                    <img src="/static/img/sell-property2.jpg" alt="sell home" style={{maxWidth:'100%'}}/>
                 </div>
 
                 <div className="col-xxl-6 py-3">
 
                     <ul className="row nav nav-underline mb-3">
                         <li className='col-auto nav-item ps-4 px-2'>
-                            <a className={`fs-6 nav-link ${!isAddNav ? 'active' : ''}`} id="basic-nav" style={{fontWeight:'600', color:'#222222', cursor:'pointer'}} onClick={() => {
+                            <button className={`fs-6 nav-link ${!isAddNav ? 'active' : ''}`} id="basic-nav" style={{fontWeight:'600', color:'#222222', cursor:'pointer'}} onClick={() => {
                                 setIsAddNav(false);
-                            }}>Enter Basic Details</a>
+                            }}>Enter Basic Details</button>
                         </li>
                         <li className='col-auto nav-item ps-4 pe-2'>
-                            <a className={`fs-6 nav-link ${isAddNav ? 'active' : ''}`} id="add-nav" style={{fontWeight:'600', color:'#222222', cursor:'pointer'}} onClick={() => {
+                            <button className={`fs-6 nav-link ${isAddNav ? 'active' : ''}`} id="add-nav" style={{fontWeight:'600', color:'#222222', cursor:'pointer'}} onClick={() => {
                                 document.getElementById('basic-details').classList.add('was-validated');
                                 if(document.getElementById('basic-details').checkValidity()) {
                                     setIsAddNav(true);
                                 }
-                            }}>Additional Details</a>
+                            }}>Additional Details</button>
                         </li>
                     </ul>
 
@@ -164,8 +149,8 @@ const SellHome = () => {
                         </div>
 
                         <div className="row m-0">
-                            <div className="input-group m-2 p-0">
-                                <label className="input-text px-2 p-1 pb-3" style={{color:'#555555'}} htmlFor="images">Upload Images</label>
+                            <div className="input-group m-2 p-0 d-flex align-items-center">
+                                <label className="input-text p-2" style={{color:'#555555'}} htmlFor="images">Upload Images</label>
                                 <input type="file" multiple className="form-control" id="images" onChange={handleImageUpload} required/>
                                 <div className="invalid-feedback ps-2">
                                     Upload atleast an image
@@ -225,13 +210,13 @@ const SellHome = () => {
 
                         <div className="row m-0">
                             <label className="px-3 p-1 pb-3" style={{color:'#555555'}} htmlFor="date_of_availability">Available On</label>
-                            <input type="date" className="form-control-sellpage mx-2 p-2 ps-3" id="date_of_availability"style={{width:'40%'}} value={dateOfAvailability} onChange={(event) => {setDateOfAvailability(event.target.value)}}/>
-                                                        
+                            <input type="date" className="form-control-sellpage mx-2 p-2 ps-3" id="date_of_availability"style={{width:'40%'}}/>
+
                             <div className="form-check form-check-reverse d-flex ms-2 p-0" style={{width:'50%'}} >
                                 <label className="form-check-label p-1 ps-3" htmlFor="ready_to_move" style={{color:'#555555'}}>
                                     Ready To Move
                                 </label>
-                                <input className="form-check-input m-2 ms-3 ps-3" type="checkbox" onChange={(event) => {setReadyToMove(event.target.checked)}} id="ready_to_move" style={{borderColor:'#bbbbbb', scale:'1.25'}}/>
+                                <input className="form-check-input m-2 ms-3 ps-3" type="checkbox" id="ready_to_move" style={{borderColor:'#bbbbbb', scale:'1.25'}}/>
                             </div>
                         </div>
 
@@ -248,17 +233,12 @@ const SellHome = () => {
                             <div className='ms-2 p-0 d-flex justify-content-center align-items-center' style={{width:'40%'}} >
                                 <button type="submit" className="btn btn-primary" onClick={(event) => {
                                     document.getElementById('add-details').classList.add('was-validated');
+                                    event.preventDefault();
                                     if(!isAuthenticated) {
-                                        event.preventDefault();
-                                        event.stopPropagation();
                                         window.bootstrap.Toast.getOrCreateInstance(document.getElementById('liveToast')).show();
                                     }
                                     else if(document.getElementById('add-details').checkValidity()) {
                                         handleSubmitForm(event);
-                                    }
-                                    else {
-                                        event.preventDefault();
-                                        event.stopPropagation();
                                     }
                                     }}>
                                     List for Sale

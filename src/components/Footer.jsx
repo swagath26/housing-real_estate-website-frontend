@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Footer = () => {
   const location = useLocation();
-  if ((location.pathname == '/buy' || location.pathname == '/buy/')) {
+  if ((location.pathname === '/buy' || location.pathname === '/buy/')) {
     return null;
   }
   return (

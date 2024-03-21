@@ -11,17 +11,17 @@ const Accounts = () => {
                 <nav className="nav px-3">
                     <ul className="nav nav-underline">
                         <li className="nav-item">
-                            <button onClick={() => {setNavigate('signinform')}} className={`nav-link ${navigate == 'signinform' ? 'active' : ''} px-3`} style={{color:'black', fontWeight:'400'}}>Sign in</button>
+                            <button onClick={() => {setNavigate('signinform')}} className={`nav-link ${navigate === 'signinform' ? 'active' : ''} px-3`} style={{color:'black', fontWeight:'400'}}>Sign in</button>
                         </li>
                         <li className="nav-item">
-                            <button onClick={() => {setNavigate('registerform')}} className={`nav-link ${navigate == 'registerform' ? 'active' : ''} px-3`} style={{color:'black', fontWeight:'400'}}>New Account</button>
+                            <button onClick={() => {setNavigate('registerform')}} className={`nav-link ${navigate === 'registerform' ? 'active' : ''} px-3`} style={{color:'black', fontWeight:'400'}}>New Account</button>
                         </li>
                     </ul>
                 </nav>
                 <div className="container mb-3">
                                     
-                    {navigate=="signinform" && <SigninForm/>}
-                    {navigate=="registerform" && <RegisterForm/>}
+                    {navigate==="signinform" && <SigninForm/>}
+                    {navigate==="registerform" && <RegisterForm/>}
                                     
                 </div>
             </div>

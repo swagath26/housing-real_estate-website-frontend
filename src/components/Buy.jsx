@@ -97,7 +97,7 @@ const Buy = () => {
   }
 
   const handleMapFilter = () => {
-    if (map.getBounds()._southWest.lat != map.getBounds()._northEast.lat && map.getBounds()._southWest.lng != map.getBounds()._northEast.lng) {
+    if (map.getBounds()._southWest.lat !== map.getBounds()._northEast.lat && map.getBounds()._southWest.lng !== map.getBounds()._northEast.lng) {
       setMinLatFilter(map.getBounds()._southWest.lat);
       setMaxLatFilter(map.getBounds()._northEast.lat);
       setMinLngFilter(map.getBounds()._southWest.lng);
@@ -154,7 +154,7 @@ const Buy = () => {
 
   const handleMapToggle = () => {
 
-    if ((document.getElementById('map-collapse') != null) && (document.getElementById('property-section') != null)) {
+    if ((document.getElementById('map-collapse') !== null) && (document.getElementById('property-section') !== null)) {
 
       const map_collapse = document.getElementById('map-collapse');
       const property_section = document.getElementById('property-section');
@@ -341,7 +341,7 @@ const Buy = () => {
 
   useEffect(() => {
     document.getElementById('search-input').addEventListener('keypress', (event) => {
-      if(event.key == 'Enter') {
+      if(event.key === 'Enter') {
         event.preventDefault();
         geocodeLocation(event.target.value);
       }
@@ -367,10 +367,10 @@ const Buy = () => {
     return (
         <div className='card property-card' style={{width:'100vh'}}
           onMouseEnter={() => {
-            selectedPropertyView!=property && markers[property.id] && markers[property.id].setIcon(icon_select)}
+            selectedPropertyView!==property && markers[property.id] && markers[property.id].setIcon(icon_select)}
           }
           onMouseLeave={() => {
-            selectedPropertyView!=property && markers[property.id] && markers[property.id].setIcon(icon_std)}
+            selectedPropertyView!==property && markers[property.id] && markers[property.id].setIcon(icon_std)}
           }
         >
 
@@ -383,7 +383,7 @@ const Buy = () => {
               </div>
               <div className='col-2' >
                 <a className='favourites-icon' id={`fav_${property.id}`} style={{display:'inline-block'}}>
-                  <img src="/static/img/fav-logo.png"/>
+                  <img src="/static/img/fav-logo.png" alt="fav-icon"/>
                 </a>
               </div>
             </div>
@@ -391,7 +391,7 @@ const Buy = () => {
               <div className="carousel-inner">
                 {property.images && 
                 property.images.map((image, index) => (
-                <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index}>
+                <div className={index===0 ? 'carousel-item active' : 'carousel-item'} key={index}>
                   <img className='w-100 object-fit-cover card-img' style={{height:'160px', overflow:'hidden'}} 
                   src={image.image}
                   alt={`Property Image ${index+1}`} />
@@ -439,9 +439,9 @@ const Buy = () => {
       <div className='dropdown'>
         <button className='btn text-nowrap dropdown-toggle' type='button' id='sortDropdown' data-bs-toggle='dropdown' aria-expanded='false'>
           Sort: {
-          (sortBy == '' && 'Default') ||
-          (sortBy == 'price' && 'Price (Low to High)') ||
-          (sortBy == '-price' && 'Price (High to Low)')
+          (sortBy === '' && 'Default') ||
+          (sortBy === 'price' && 'Price (Low to High)') ||
+          (sortBy === '-price' && 'Price (High to Low)')
           }
         </button>
         <ul className='dropdown-menu' aria-labelledby='sortDropdown'>
@@ -469,35 +469,35 @@ const Buy = () => {
           <div className='row mb-1 m-0' hidden={!isExactMatchBeds}>
             <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed1" checked={bedsFilter.includes(1)} onChange={(event) => {
-                setBedsFilter(event.target.checked ? [...bedsFilter, 1] : bedsFilter.filter((n) => n != 1));
+                setBedsFilter(event.target.checked ? [...bedsFilter, 1] : bedsFilter.filter((n) => n !== 1));
               }} />
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed1">1</label>
             </div>
 
             <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed2" checked={bedsFilter.includes(2)} onChange={(event) => {
-                setBedsFilter(event.target.checked ? [...bedsFilter, 2] : bedsFilter.filter((n) => n != 2));
+                setBedsFilter(event.target.checked ? [...bedsFilter, 2] : bedsFilter.filter((n) => n !== 2));
               }}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed2">2</label>
             </div>
 
             <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed3" checked={bedsFilter.includes(3)} onChange={(event) => {
-                setBedsFilter(event.target.checked ? [...bedsFilter, 3] : bedsFilter.filter((n) => n != 3));
+                setBedsFilter(event.target.checked ? [...bedsFilter, 3] : bedsFilter.filter((n) => n !== 3));
               }}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed3">3</label>
             </div>
 
             <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed4" checked={bedsFilter.includes(4)} onChange={(event) => {
-                setBedsFilter(event.target.checked ? [...bedsFilter, 4] : bedsFilter.filter((n) => n != 4));
+                setBedsFilter(event.target.checked ? [...bedsFilter, 4] : bedsFilter.filter((n) => n !== 4));
               }}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed4">4</label>
             </div>
 
             <div className='col px-2'>
               <input type="checkbox" className="btn-check" id="bed5" checked={bedsFilter.includes(5)} onChange={(event) => {
-                setBedsFilter(event.target.checked ? [...bedsFilter, 5] : bedsFilter.filter((n) => n != 5));
+                setBedsFilter(event.target.checked ? [...bedsFilter, 5] : bedsFilter.filter((n) => n !== 5));
               }}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed5">5</label>
             </div>
@@ -505,27 +505,27 @@ const Buy = () => {
 
           <div className='row mb-1 m-0' hidden={isExactMatchBeds}>
             <div className='col px-2'>
-              <input type="radio" className="btn-check" name='bedrooms' id="bed1+" checked={minBedsFilter==1} onChange={(event) => {
+              <input type="radio" className="btn-check" name='bedrooms' id="bed1+" checked={minBedsFilter===1} onChange={(event) => {
                 setMinBedsFilter(event.target.checked ? 1 : null)}}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed1+">1+</label>
             </div>
             <div className='col px-2'>
-              <input type="radio" className="btn-check" name='bedrooms' id="bed2+" checked={minBedsFilter==2} onChange={(event) => {
+              <input type="radio" className="btn-check" name='bedrooms' id="bed2+" checked={minBedsFilter===2} onChange={(event) => {
                 setMinBedsFilter(event.target.checked ? 2 : null)}}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed2+">2+</label>
             </div>
             <div className='col px-2'>
-              <input type="radio" className="btn-check" name='bedrooms' id="bed3+" checked={minBedsFilter==3} onChange={(event) => {
+              <input type="radio" className="btn-check" name='bedrooms' id="bed3+" checked={minBedsFilter===3} onChange={(event) => {
                 setMinBedsFilter(event.target.checked ? 3 : null)}}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed3+">3+</label>
             </div>
             <div className='col px-2'>
-              <input type="radio" className="btn-check" name='bedrooms' id="bed4+" checked={minBedsFilter==4} onChange={(event) => {
+              <input type="radio" className="btn-check" name='bedrooms' id="bed4+" checked={minBedsFilter===4} onChange={(event) => {
                 setMinBedsFilter(event.target.checked ? 4 : null)}}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed4+">4+</label>
             </div>
             <div className='col px-2'>
-              <input type="radio" className="btn-check" name='bedrooms' id="bed5+" checked={minBedsFilter==5} onChange={(event) => {
+              <input type="radio" className="btn-check" name='bedrooms' id="bed5+" checked={minBedsFilter===5} onChange={(event) => {
                 setMinBedsFilter(event.target.checked ? 5 : null)}}/>
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bed5+">5+</label>
             </div>
@@ -540,7 +540,7 @@ const Buy = () => {
           
           <div className='row my-1 m-0'>
             <button className='btn btn-primary' onClick={() => {
-              if(minBedsFilter != '')
+              if(minBedsFilter !== '')
                 setFilterBeds(`${minBedsFilter}+ bds`)
               else if(bedsFilter.length > 0)
                 setFilterBeds(`${bedsFilter.sort().join(', ')} bds`)
@@ -564,31 +564,31 @@ const Buy = () => {
         <div className='card-body'>
           <div className='row mb-1 m-0'>
             <div className='col px-2'>
-              <input type="radio" className="btn-check" id="bath1+" name='bathroms' checked={minBathsFilter==1} onChange={(event) => {
+              <input type="radio" className="btn-check" id="bath1+" name='bathroms' checked={minBathsFilter===1} onChange={(event) => {
                 setMinBathsFilter(event.target.checked ? 1 : null)}} />
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath1+">1+</label>
             </div>
 
             <div className='col px-2'>
-              <input type="radio" className="btn-check" id="bath2+" name='bathroms' checked={minBathsFilter==2} onChange={(event) => {
+              <input type="radio" className="btn-check" id="bath2+" name='bathroms' checked={minBathsFilter===2} onChange={(event) => {
                 setMinBathsFilter(event.target.checked ? 2 : null)}} />
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath2+">2+</label>
             </div>
 
             <div className='col px-2'>
-              <input type="radio" className="btn-check" id="bath3+" name='bathroms' checked={minBathsFilter==3} onChange={(event) => {
+              <input type="radio" className="btn-check" id="bath3+" name='bathroms' checked={minBathsFilter===3} onChange={(event) => {
                 setMinBathsFilter(event.target.checked ? 3 : null)}} />
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath3+">3+</label>
             </div>
 
             <div className='col px-2'>
-              <input type="radio" className="btn-check" id="bath4+" name='bathroms' checked={minBathsFilter==4} onChange={(event) => {
+              <input type="radio" className="btn-check" id="bath4+" name='bathroms' checked={minBathsFilter===4} onChange={(event) => {
                 setMinBathsFilter(event.target.checked ? 4 : null)}} />
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath4+">4+</label>
             </div>
 
             <div className='col px-2'>
-              <input type="radio" className="btn-check" id="bath5+" name='bathroms' checked={minBathsFilter==5} onChange={(event) => {
+              <input type="radio" className="btn-check" id="bath5+" name='bathroms' checked={minBathsFilter===5} onChange={(event) => {
                 setMinBathsFilter(event.target.checked ? 5 : null)}} />
               <label className="btn btn-outline-primary" style={{minWidth:'45px'}} htmlFor="bath5+">5+</label>
             </div>
@@ -596,7 +596,7 @@ const Buy = () => {
           
           <div className='row my-1 mt-3 m-0'>
             <button className='btn btn-primary' data-bs-dismiss='dropdown' data-bs-target='#baths-dropdown' onClick={() => {
-              if(minBathsFilter != '')
+              if(minBathsFilter !== '')
                 setFilterBaths(`${minBathsFilter}+ baths`)
               else
                 setFilterBaths('Baths')
@@ -619,28 +619,28 @@ const Buy = () => {
             <div className='row mb-1'>
               <div className='form-check'>
                 <input type="checkbox" className="form-check-input" id="houses" checked={homeTypefilter.includes('Houses')} onChange={(event) => {
-                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Houses'] : homeTypefilter.filter((n) => n != 'Houses'));
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Houses'] : homeTypefilter.filter((n) => n !== 'Houses'));
               }}/>
                 <label className='form-check-label' htmlFor="houses">Houses</label>
               </div>
 
               <div className='form-check'>
                 <input type="checkbox" className="form-check-input" id="apartments" checked={homeTypefilter.includes('Apartments')} onChange={(event) => {
-                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Apartments'] : homeTypefilter.filter((n) => n != 'Apartments'));
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Apartments'] : homeTypefilter.filter((n) => n !== 'Apartments'));
               }}/>
                 <label htmlFor="apartments">Apartments</label>
               </div>
 
               <div className='form-check'>
                 <input type="checkbox" className="form-check-input" id="condos" checked={homeTypefilter.includes('Condos/Co-ops')} onChange={(event) => {
-                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Condos/Co-ops'] : homeTypefilter.filter((n) => n != 'Condos/Co-ops'));
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Condos/Co-ops'] : homeTypefilter.filter((n) => n !== 'Condos/Co-ops'));
               }} />
                 <label htmlFor="condos">Condos/Co-ops</label>
               </div>
 
               <div className='form-check'>
                 <input type="checkbox" className="form-check-input" id="multi"  checked={homeTypefilter.includes('Multi-family')} onChange={(event) => {
-                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Multi-family'] : homeTypefilter.filter((n) => n != 'Multi-family'));
+                setHomeTypeFilter(event.target.checked ? [...homeTypefilter, 'Multi-family'] : homeTypefilter.filter((n) => n !== 'Multi-family'));
               }}/>
                 <label htmlFor="multi">Multi-family</label>
               </div>

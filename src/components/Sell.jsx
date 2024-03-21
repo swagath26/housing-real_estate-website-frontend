@@ -41,7 +41,7 @@ const Sell = () => {
                 </div>
                 <br />
                 <div className="row">
-                    <a href="#" className="link">Learn more about FSBO</a>
+                <Link className="link" style={{textDecoration:'none'}}>Learn more about FSBO</Link>
                 </div>
                 <br />
                 <div className="row mt-3">

@@ -89,7 +89,7 @@ const TopView = () => {
   };
   useEffect(() => {
     document.getElementById('search-input').addEventListener('keypress', (event) => {
-      if(event.key == 'Enter') {
+      if(event.key === 'Enter') {
         event.preventDefault();
         navigate(`/buy/${event.target.value}`);
       }
@@ -147,19 +147,19 @@ const PropertyCard = ({ property }) => {
                 </div>
               </div>
               <div className='col-2' >
-                <a className='favourites-icon' id={`fav_${property.id}`} style={{display:'inline-block'}}>
-                  <img src="/static/img/fav-logo.png"/>
-                </a>
+                <i className='favourites-icon' id={`fav_${property.id}`} style={{display:'inline-block'}}>
+                  <img src="/static/img/fav-logo.png" alt='fav-icon'/>
+                </i>
               </div>
             </div>
             <div id={`property_${property.id}`} className="carousel slide" style={{zIndex:'0'}}>
               <div className="carousel-inner">
                 {property.images && 
                 property.images.map((image, index) => (
-                <div className={index==0 ? 'carousel-item active' : 'carousel-item'} key={index}>
+                <div className={index===0 ? 'carousel-item active' : 'carousel-item'} key={index}>
                   <img className='w-100 object-fit-cover card-img' style={{height:'160px', overflow:'hidden'}} 
                   src={image.image}
-                  alt={`Property Image ${index+1}`} />
+                  alt={`Property ${index+1}`} />
                 </div>
                 ))}
               </div>
@@ -297,8 +297,7 @@ const RecommendedSection = () => {
 }
 
 const Homepage = () => {
-  
-  const user = useContext(AuthContext).user;
+
   const navigate = useNavigate();
 
   return (
@@ -313,7 +312,7 @@ const Homepage = () => {
             <div className='card nav-card' id='buy-card' onClick={() => navigate(`/buy`)}>
               <div className='row p-2 m-0 d-flex justify-content-center'>
                 <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
-                  <img src="/static/img/buy.jpg" style={{width:'100%', maxWidth:'350px'}}/>
+                  <img src="/static/img/buy.jpg" style={{width:'100%', maxWidth:'350px'}} alt='buy'/>
                 </div>
                 <div className='col-lg-12 col-12 col-md-6 p-2'>
                   <div className='row p-2 m-0'>
@@ -337,7 +336,7 @@ const Homepage = () => {
             <div className='card nav-card' id='sell-card' onClick={() => navigate(`/sell`)}>
               <div className='row p-2 m-0 d-flex justify-content-center'>
                 <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
-                  <img src="/static/img/sell.jpg" style={{width:'100%', maxWidth:'350px'}}/>
+                  <img src="/static/img/sell.jpg" style={{width:'100%', maxWidth:'350px'}} alt='sell'/>
                 </div>
                 <div className='col-lg-12 col-12 col-md-6 p-2'>
                   <div className='row p-2 m-0'>
@@ -361,7 +360,7 @@ const Homepage = () => {
             <div className='card nav-card' id='rent-card' onClick={() => navigate(`/price_estimator`)}>
               <div className='row p-2 m-0 d-flex justify-content-center'>
                 <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
-                  <img src="/static/img/rent.jpg" style={{width:'100%', maxWidth:'350px'}}/>
+                  <img src="/static/img/rent.jpg" style={{width:'100%', maxWidth:'350px'}} alt='rent'/>
                 </div>
                 <div className='col-lg-12 col-12 col-md-6 p-2'>
                   <div className='row p-2 m-0'>

@@ -21,7 +21,7 @@
 //             });
 //             setProperty(response.data[0]);
 //             setIsLoading(false);
-//             setIsOwner(response.data[0].username == username)
+//             setIsOwner(response.data[0].username === username)
 //         }
 //         catch (error) {
 //             setIsLoading(false);
