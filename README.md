@@ -1,2 +1,3 @@
-# housing-assistant-client
-Client Side code for housing assistant webapp
+# Housing-demo React app
+A fully responsive demo Real Estate Website built with React.js 
+👉[Checkout](https://housing-demo.netlify.app/)
