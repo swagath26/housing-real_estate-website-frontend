@@ -45,7 +45,7 @@ const Header = () => {
               <ul className='navbar-nav text-light'>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/buy" className="nav-link text-light">Buy</Link></li>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/sell" className="nav-link text-light">Sell</Link></li>
-                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/price_estimator" className="nav-link text-light">Estimate</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link className="nav-link text-light">Estimate</Link></li>
                 {!isAuthenticated && 
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas">
                   <Link to="/accounts" className='nav-link text-light' data-bs-toggle='modal' data-bs-target='#accounts'>Signin</Link>
@@ -63,7 +63,7 @@ const Header = () => {
                     </ul>
                 </li>
                 }
-                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/about" className="nav-link text-light">About</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link className="nav-link text-light">About</Link></li>
               </ul>
             </div>
           </div>
@@ -265,11 +265,12 @@ const RecommendedSection = () => {
   return (
       <div className="container pb-5 pt-3 px-0">
         <div className='row px-3 mx-0'>
-          <div className='col-10 col-xl-11 px-0'>
+          <div className='col-8 col-md-9 col-xl-10 px-0'>
             <h1 className='fs-3'>Homes For You</h1>
-            <p className='lead fs-6'>Based on market insights and recently activity</p>
+            <p className='lead fs-6'>Based on market insights and recent activity</p>
           </div>
-          <div className='col-2 col-xl-1 px-0 d-flex align-items-center justify-content-between'>
+          <div className='col-1'></div>
+          <div className='col-3 col-md-2 col-xl-1 px-0 d-flex align-items-center justify-content-between'>
             <div id="scroll-left-button-div" onClick={handlePreviousSlide}>
             <i id='scroll-left-button' className='fa-solid fa-chevron-left'/>
             </div>
@@ -358,22 +359,22 @@ const Homepage = () => {
           </div>
 
           <div className='col-lg-4 p-3'>
-            <div className='card nav-card' id='rent-card' onClick={() => navigate(`/price_estimator`)}>
+            <div className='card nav-card' id='rent-card'>
               <div className='row p-2 m-0 d-flex justify-content-center'>
                 <div className='col-lg-12 col-12 col-md-6 d-flex align-items-center p-2'>
                   <img src="/static/img/rent.jpg" style={{width:'100%', maxWidth:'350px'}} alt='rent'/>
                 </div>
                 <div className='col-lg-12 col-12 col-md-6 p-2'>
                   <div className='row p-2 m-0'>
-                    <h3 className='d-flex justify-content-center' style={{fontFamily:'serif'}}>Estimate home</h3>
+                    <h3 className='d-flex justify-content-center' style={{fontFamily:'serif'}}>Estimate a home</h3>
                   </div>
                   <div className='row p-0 py-2 m-0 d-flex align-items-center' style={{height:'120px'}}>
-                    <p style={{textAlign:'center', fontSize:'17px'}}>Get a seamless online experience from shopping on the largest 
-                      rental network, to applying, to paying rent.</p>
+                    <p style={{textAlign:'center', fontSize:'17px'}}>Experience a seamless AI-powered solution for accurately 
+                    assessing property values in specific locations.</p>
                   </div>
                   <div className='row p-4 m-0 d-flex justify-content-center'>
                     <button className='btn btn-outline-primary fw-bold' id='rent-button' style={{maxWidth:'200px'}}>
-                      Find Rentals
+                      Evaluate Now
                     </button>
                   </div>
                 </div>

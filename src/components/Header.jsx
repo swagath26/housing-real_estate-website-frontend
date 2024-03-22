@@ -47,7 +47,7 @@ const Header = () => {
               <ul className='navbar-nav'>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/buy" className="nav-link">Buy</Link></li>
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/sell" className="nav-link">Sell</Link></li>
-                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/price_estimator" className="nav-link">Estimate</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link className="nav-link">Estimate</Link></li>
                 {!isAuthenticated && 
                 <li className="nav-item px-2" data-bs-dismiss="offcanvas">
                   <Link to="/accounts" className='nav-link' data-bs-toggle='modal' data-bs-target='#accounts'>Signin</Link>
@@ -65,7 +65,7 @@ const Header = () => {
                   </ul>
                 </li>
                 }
-                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link to="/about" className="nav-link">About</Link></li>
+                <li className="nav-item px-2" data-bs-dismiss="offcanvas"><Link className="nav-link">About</Link></li>
               </ul>
             </div>
           </div>
